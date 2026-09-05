@@ -189,7 +189,8 @@
     </div>
 
     <script>
-        const WEBHOOK_URL = 'https://n8n.onlineadhyapak.com/webhook/webhook';
+        // The webhook URL is securely hidden behind a Vercel Serverless Function
+        const WEBHOOK_URL = '/api/webhook';
         
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
