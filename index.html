@@ -110,6 +110,23 @@
             border-bottom-left-radius: 4px;
         }
 
+        .message.bot ul, .message.bot ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .message.bot li {
+            cursor: pointer;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .message.bot li:hover {
+            opacity: 0.7;
+            text-decoration: underline;
+        }
+
         .quick-replies {
             display: flex;
             flex-wrap: wrap;
@@ -272,6 +289,18 @@
             
             if (sender === 'bot') {
                 messageDiv.innerHTML = marked.parse(text);
+                
+                // Add click listeners to all list items to act as interactive options
+                const listItems = messageDiv.querySelectorAll('li');
+                listItems.forEach(li => {
+                    li.title = "Click to select this option";
+                    li.addEventListener('click', () => {
+                        const itemText = li.textContent.trim();
+                        if (itemText) {
+                            sendMessage(itemText);
+                        }
+                    });
+                });
             } else {
                 messageDiv.textContent = text;
             }
