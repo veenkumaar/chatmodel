@@ -110,6 +110,31 @@
             border-bottom-left-radius: 4px;
         }
 
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+            align-self: flex-start;
+            max-width: 80%;
+        }
+
+        .quick-reply-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-reply-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
         .chat-input-container {
             padding: 20px;
             background-color: var(--chat-bg);
@@ -270,13 +295,19 @@
             }
         }
 
-        async function sendMessage() {
-            const text = chatInput.value.trim();
+        async function sendMessage(overrideText = null) {
+            const text = typeof overrideText === 'string' ? overrideText : chatInput.value.trim();
             if (!text) return;
+
+            // Remove existing quick replies if any when a message is sent
+            const existingReplies = document.querySelectorAll('.quick-replies');
+            existingReplies.forEach(el => el.remove());
 
             // 1. Add user message to UI
             addMessage(text, 'user');
-            chatInput.value = '';
+            if (typeof overrideText !== 'string') {
+                chatInput.value = '';
+            }
             
             // 2. Show loading
             showLoading(true);
@@ -300,10 +331,14 @@
 
                 const contentType = response.headers.get("content-type");
                 let botResponseText = "";
+                let quickReplies = null;
                 
                 if (contentType && contentType.includes("application/json")) {
                     const data = await response.json();
                     botResponseText = data.output || data.response || data.text || data.message || "Message received, but format unknown.";
+                    if (data.quick_replies && Array.isArray(data.quick_replies)) {
+                        quickReplies = data.quick_replies;
+                    }
                 } else {
                     botResponseText = await response.text();
                 }
@@ -311,6 +346,10 @@
                 showLoading(false);
                 
                 addMessage(botResponseText, 'bot');
+
+                if (quickReplies && quickReplies.length > 0) {
+                    renderQuickReplies(quickReplies);
+                }
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -319,7 +358,23 @@
             }
         }
 
-        sendBtn.addEventListener('click', sendMessage);
+        function renderQuickReplies(replies) {
+            const container = document.createElement('div');
+            container.classList.add('quick-replies');
+            
+            replies.forEach(reply => {
+                const btn = document.createElement('button');
+                btn.classList.add('quick-reply-btn');
+                btn.textContent = reply;
+                btn.onclick = () => sendMessage(reply);
+                container.appendChild(btn);
+            });
+            
+            chatMessages.insertBefore(container, loadingIndicator);
+            scrollToBottom();
+        }
+
+        sendBtn.addEventListener('click', () => sendMessage());
         
         chatInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
