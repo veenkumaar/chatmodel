@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -68,6 +69,31 @@
             font-size: 0.95rem;
             line-height: 1.4;
             word-wrap: break-word;
+        }
+        
+        .message p {
+            margin-bottom: 8px;
+        }
+        .message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .message th, .message td {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .message th {
+            background-color: rgba(0, 0, 0, 0.05);
+            font-weight: 600;
         }
 
         .message.user {
@@ -218,7 +244,13 @@
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
-            messageDiv.textContent = text;
+            
+            if (sender === 'bot') {
+                messageDiv.innerHTML = marked.parse(text);
+            } else {
+                messageDiv.textContent = text;
+            }
+            
             
             // Insert before loading indicator
             chatMessages.insertBefore(messageDiv, loadingIndicator);
