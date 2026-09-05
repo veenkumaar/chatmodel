@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Chat</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -42,6 +43,7 @@
             flex-direction: column;
             overflow: hidden;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .chat-header {
@@ -173,6 +175,12 @@
         .chat-input:focus {
             border-color: var(--primary-color);
         }
+        
+        .chat-input:disabled {
+            background-color: #f1f3f5;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
 
         .send-button {
             flex-shrink: 0;
@@ -189,12 +197,43 @@
             transition: background-color 0.2s, transform 0.1s;
         }
 
-        .send-button:hover {
+        .send-button:hover:not(:disabled) {
             background-color: #0056b3;
         }
 
-        .send-button:active {
+        .send-button:active:not(:disabled) {
             transform: scale(0.95);
+        }
+        
+        .send-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .new-message-btn {
+            position: absolute;
+            bottom: 95px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+        
+        .new-message-btn.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         @media (max-width: 480px) {
@@ -269,6 +308,7 @@
                 </svg>
             </button>
         </div>
+        <button id="new-message-btn" class="new-message-btn">↓ New Message</button>
     </div>
 
     <script>
@@ -279,16 +319,19 @@
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const loadingIndicator = document.getElementById('loading-indicator');
+        const newMessageBtn = document.getElementById('new-message-btn');
 
         // Generate a random session ID for memory in n8n
         const sessionId = Math.random().toString(36).substring(2, 15);
+        
+        let isUserScrolling = false;
 
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
             
             if (sender === 'bot') {
-                messageDiv.innerHTML = marked.parse(text);
+                messageDiv.innerHTML = DOMPurify.sanitize(marked.parse(text));
                 
                 // Add click listeners to all list items to act as interactive options
                 const listItems = messageDiv.querySelectorAll('li');
@@ -311,16 +354,43 @@
             scrollToBottom();
         }
 
-        function scrollToBottom() {
+        function forceScrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            isUserScrolling = false;
+            newMessageBtn.classList.remove('visible');
         }
+
+        function scrollToBottom() {
+            if (!isUserScrolling) {
+                forceScrollToBottom();
+            } else {
+                newMessageBtn.classList.add('visible');
+            }
+        }
+        
+        chatMessages.addEventListener('scroll', () => {
+            const distanceFromBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight;
+            if (distanceFromBottom > 50) {
+                isUserScrolling = true;
+            } else {
+                isUserScrolling = false;
+                newMessageBtn.classList.remove('visible');
+            }
+        });
+        
+        newMessageBtn.addEventListener('click', forceScrollToBottom);
 
         function showLoading(show) {
             if (show) {
                 loadingIndicator.classList.add('active');
+                chatInput.disabled = true;
+                sendBtn.disabled = true;
                 scrollToBottom();
             } else {
                 loadingIndicator.classList.remove('active');
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                setTimeout(() => chatInput.focus(), 50);
             }
         }
 
