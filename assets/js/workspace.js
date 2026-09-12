@@ -18,16 +18,62 @@ function showToast(message) {
     }, 3000);
 }
 
+function copyEnterpriseWebhookUrl() {
+    const el = document.getElementById('enterpriseWebhookUrl');
+    if (!el) return;
+    const url = el.value.trim();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('Webhook URL copied to clipboard!');
+        }).catch(() => {
+            el.select();
+            document.execCommand('copy');
+            showToast('Webhook URL copied to clipboard!');
+        });
+    } else {
+        el.select();
+        document.execCommand('copy');
+        showToast('Webhook URL copied to clipboard!');
+    }
+}
+
+function syncPasscodeRequirement() {
+    const modeSelect = document.getElementById('userChatAccessMode');
+    const keyInput = document.getElementById('userInternalAccessKey');
+    const badge = document.getElementById('passcodeRequiredBadge');
+    if (!modeSelect || !keyInput) return;
+
+    const isPrivate = modeSelect.value === 'private';
+    keyInput.required = isPrivate;
+    if (badge) {
+        badge.style.display = isPrivate ? 'inline' : 'none';
+    }
+    if (isPrivate) {
+        keyInput.setAttribute('placeholder', 'e.g. team_secret_2026 (Mandatory for Private mode)');
+    } else {
+        keyInput.setAttribute('placeholder', 'e.g. team_secret_2026 (Optional for Public mode)');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    syncPasscodeRequirement();
+});
+
 async function handleSaveUserWorkspace(e) {
     e.preventDefault();
     const subdomain = document.getElementById('userSubdomain').value;
     const businessName = document.getElementById('userBusinessName').value.trim();
     const themeColor = document.getElementById('userThemeColor').value;
     const welcomeMessage = document.getElementById('userWelcomeMessage').value.trim();
-    const customDomain = document.getElementById('userCustomDomain').value.trim();
-    const webhookUrl = document.getElementById('userWebhookUrl').value.trim();
-    const crmWebhookUrl = document.getElementById('userCrmWebhookUrl').value.trim();
-    const webhookSecret = document.getElementById('userWebhookSecret').value.trim();
+    const chatAccessMode = document.getElementById('userChatAccessMode') ? document.getElementById('userChatAccessMode').value : 'public';
+    const internalAccessKey = document.getElementById('userInternalAccessKey') ? document.getElementById('userInternalAccessKey').value.trim() : '';
+
+    if (chatAccessMode === 'private' && !internalAccessKey) {
+        alert('A Dedicated Internal Team Passcode / Key is mandatory when choosing Private mode.');
+        const keyInput = document.getElementById('userInternalAccessKey');
+        if (keyInput) keyInput.focus();
+        return;
+    }
 
     try {
         const res = await fetch('/api/tenants.php', {
@@ -39,10 +85,8 @@ async function handleSaveUserWorkspace(e) {
                 business_name: businessName,
                 theme_color: themeColor,
                 welcome_message: welcomeMessage,
-                custom_domain: customDomain,
-                webhook_url: webhookUrl,
-                crm_webhook_url: crmWebhookUrl,
-                webhook_secret: webhookSecret
+                chat_access_mode: chatAccessMode,
+                internal_access_key: internalAccessKey
             })
         });
         const data = await res.json();
@@ -54,86 +98,6 @@ async function handleSaveUserWorkspace(e) {
         }
     } catch (err) {
         alert('Server error updating workspace.');
-    }
-}
-
-async function verifyUserDns() {
-    const domain = document.getElementById('userCustomDomain').value.trim();
-    const subdomain = document.getElementById('userSubdomain').value;
-    const statusEl = document.getElementById('userDnsStatus');
-    if (!domain) {
-        alert('Please enter a custom domain (e.g. chat.yourbrand.com) first.');
-        return;
-    }
-    statusEl.style.display = 'block';
-    statusEl.style.background = 'rgba(99, 102, 241, 0.1)';
-    statusEl.style.color = '#818cf8';
-    statusEl.innerHTML = '🔍 Querying global DNS nameservers for CNAME record...';
-
-    try {
-        const res = await fetch('/api/tenants.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'verify_custom_domain',
-                custom_domain: domain,
-                subdomain: subdomain
-            })
-        });
-        const data = await res.json();
-        if (data.cname_matched) {
-            statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
-            statusEl.style.color = '#10b981';
-            statusEl.innerHTML = `✅ <strong>DNS Verified:</strong> CNAME is pointing correctly to <code>${data.detected_cname || data.required_cname}</code>. Whitelabel routing is active!`;
-        } else {
-            statusEl.style.background = 'rgba(239, 68, 68, 0.12)';
-            statusEl.style.color = '#ef4444';
-            statusEl.innerHTML = `⚠️ <strong>DNS Pending:</strong> Target '${domain}' is not yet pointing to <code>${data.required_cname}</code> (detected: <code>${data.detected_cname || 'None'}</code>).<br>${data.instructions}`;
-        }
-    } catch (e) {
-        statusEl.innerHTML = 'DNS verification request failed.';
-    }
-}
-
-async function pingUserCrm() {
-    const crmUrl = document.getElementById('userCrmWebhookUrl').value.trim();
-    const secret = document.getElementById('userWebhookSecret').value.trim();
-    const subdomain = document.getElementById('userSubdomain').value;
-    const statusEl = document.getElementById('userCrmStatus');
-
-    if (!crmUrl) {
-        alert('Please enter a CRM Webhook URL to test.');
-        return;
-    }
-
-    statusEl.style.display = 'block';
-    statusEl.style.background = 'rgba(99, 102, 241, 0.1)';
-    statusEl.style.color = '#818cf8';
-    statusEl.innerHTML = '🚀 Sending test lead payload to CRM pipeline...';
-
-    try {
-        const res = await fetch('/api/tenants.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'test_crm_pipeline',
-                subdomain: subdomain,
-                crm_webhook_url: crmUrl,
-                webhook_secret: secret
-            })
-        });
-        const data = await res.json();
-        if (data.success) {
-            statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
-            statusEl.style.color = '#10b981';
-            statusEl.innerHTML = `✅ <strong>CRM Connected:</strong> ${data.message} (HTTP ${data.http_code})`;
-        } else {
-            statusEl.style.background = 'rgba(239, 68, 68, 0.12)';
-            statusEl.style.color = '#ef4444';
-            statusEl.innerHTML = `❌ <strong>CRM Test Failed:</strong> ${data.error}`;
-        }
-    } catch (e) {
-        statusEl.innerHTML = 'CRM Ping request failed.';
     }
 }
 

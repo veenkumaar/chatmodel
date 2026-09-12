@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Portal - ChatModel SaaS</title>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
@@ -29,15 +31,6 @@
                     <label>Subdomain Endpoint</label>
                     <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #0284c7; padding: 6px 0;" id="editSubdomainLabel"></div>
                 </div>
-
-                <div class="form-group">
-                    <label>Custom CNAME Whitelabel Domain (e.g. chat.yourbrand.com)</label>
-                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
-                        <input type="text" id="editCustomDomain" class="form-control" placeholder="chat.yourbrand.com">
-                        <button type="button" onclick="verifyDnsDomain('edit')" class="btn-logs" style="padding: 0 12px; font-size: 0.78rem;">⚡ Test DNS</button>
-                    </div>
-                </div>
-                <div id="editDnsStatus" style="font-size: 0.76rem; display: none; line-height: 1.4; padding: 6px 10px; border-radius: 8px; margin-bottom: 12px;"></div>
 
                 <div class="form-group">
                     <label>Business / Client Brand Name</label>
@@ -70,17 +63,18 @@
                 </div>
 
                 <div style="background: var(--toggle-bg); border: 1px solid var(--input-border); border-radius: 12px; padding: 12px; margin-bottom: 16px;">
-                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-heading); margin-bottom: 8px;">CRM Lead Capture Pipeline Integration</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-heading); margin-bottom: 8px;">🔒 Chat Access & Privacy Control</div>
                     <div class="form-group" style="margin-bottom: 8px;">
-                        <label style="font-size: 0.75rem;">CRM Webhook URL</label>
-                        <input type="url" id="editCrmWebhookUrl" class="form-control" placeholder="https://api.crm.com/leads">
+                        <label style="font-size: 0.75rem;">Access Mode</label>
+                        <select id="editChatAccessMode" class="form-control">
+                            <option value="public">🌐 Public (Open to anyone)</option>
+                            <option value="private">🔒 Private / Internal (Login required)</option>
+                        </select>
                     </div>
-                    <div class="form-group" style="margin-bottom: 8px;">
-                        <label style="font-size: 0.75rem;">CRM Bearer Secret Token</label>
-                        <input type="text" id="editWebhookSecret" class="form-control" placeholder="sec_live_...">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-size: 0.75rem;">Internal Access Passcode / Key (Optional)</label>
+                        <input type="text" id="editInternalAccessKey" class="form-control" placeholder="e.g. team_secret_key (or uses workspace password)">
                     </div>
-                    <button type="button" onclick="testCrmPipeline('edit')" class="btn-logs" style="width: 100%; font-size: 0.78rem; justify-content: center; padding: 6px;">⚡ Send Test Lead Ping</button>
-                    <div id="editCrmStatus" style="font-size: 0.76rem; display: none; line-height: 1.4; padding: 6px 10px; border-radius: 8px; margin-top: 8px;"></div>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -132,6 +126,36 @@
         </div>
     </div>
 
+    <!-- Reset Subdomain Workspace Password Modal (Admin) -->
+    <div id="resetSubdomainPasswordModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title">🔑 Reset Subdomain Password</div>
+                <button class="modal-close" onclick="closeResetSubdomainPasswordModal()">✕</button>
+            </div>
+            <form id="resetSubdomainPasswordForm" onsubmit="handleResetSubdomainPassword(event)">
+                <input type="hidden" id="resetTargetSubdomain">
+                <div class="form-group">
+                    <label>Workspace Subdomain</label>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; color: #0284c7; padding: 4px 0 10px 0;" id="resetSubdomainDisplay"></div>
+                </div>
+                <div class="form-group">
+                    <label>New Workspace Password (min 6 chars)</label>
+                    <input type="password" id="resetNewPassword" class="form-control" placeholder="Enter new password" required minlength="6" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="resetConfirmPassword" class="form-control" placeholder="Re-type new password" required minlength="6" autocomplete="new-password">
+                </div>
+                <div id="resetPasswordStatus" style="font-size: 0.78rem; display: none; line-height: 1.4; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 18px;">
+                    <button type="button" onclick="closeResetSubdomainPasswordModal()" style="flex: 1; background: var(--toggle-bg); color: var(--text-heading); border: 1px solid var(--input-border); padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-submit" style="flex: 1; margin-top: 0;">Set Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Delete Tenant Modal -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-box" style="max-width: 440px; text-align: center;">
@@ -154,7 +178,7 @@
             <div>
                 <h2 style="color: var(--text-heading); font-size: 1.35rem; font-weight: 700; margin-bottom: 2px;">
                     Global Admin & Subdomain Control</h2>
-                <div style="font-size: 0.85rem; color: var(--text-body);">Manage all tenant webhook pipelines, CRM sync, conversation quotas, and service states.</div>
+                <div style="font-size: 0.85rem; color: var(--text-body);">Manage all tenant webhook pipelines, conversation quotas, and service states.</div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <span class="admin-tag">🛡️ <?php echo htmlspecialchars($adminUser); ?></span>
@@ -191,7 +215,7 @@
                         <span class="header-icon">🚀</span>
                         <div>
                             <h4>Provision Dedicated Subdomain & Workspace</h4>
-                            <p>Deploy an isolated assistant workspace with custom routing, CRM pipeline, and quota tier</p>
+                            <p>Deploy an isolated assistant workspace with custom routing, access controls, and quota tier</p>
                         </div>
                     </div>
                     <span class="instant-badge">⚡ Instant Provisioning</span>
@@ -240,30 +264,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Whitelabel CNAME & CRM Pipeline -->
-                    <div class="form-field">
-                        <label>
-                            <span>Custom CNAME Domain</span>
-                            <span class="optional-tag">Whitelabel</span>
-                        </label>
-                        <div class="standard-input-box">
-                            <span class="input-icon">🌐</span>
-                            <input type="text" id="newCustomDomain" placeholder="chat.yourcompany.com" style="font-family: 'JetBrains Mono', monospace;">
-                        </div>
-                    </div>
-
-                    <div class="form-field">
-                        <label>
-                            <span>CRM Lead Webhook</span>
-                            <span class="optional-tag">HubSpot / Zoho</span>
-                        </label>
-                        <div class="standard-input-box">
-                            <span class="input-icon">📩</span>
-                            <input type="url" id="newCrmWebhookUrl" placeholder="https://api.crm.com/leads" style="font-family: 'JetBrains Mono', monospace; font-size: 0.84rem;">
-                        </div>
-                    </div>
-
-                    <!-- Row 4: Theme Color & CRM Bearer Token -->
+                    <!-- Row 3: Brand Theme Color -->
                     <div class="form-field">
                         <label>Brand Theme Color</label>
                         <div class="color-picker-box">
@@ -273,86 +274,105 @@
                         </div>
                     </div>
 
+                    <!-- Row 4: Chat Access & Security -->
                     <div class="form-field">
                         <label>
-                            <span>CRM Secret / Bearer Token</span>
-                            <span class="optional-tag">Auth</span>
+                            <span>Chat Access Mode</span>
+                            <span class="optional-tag">Security</span>
                         </label>
                         <div class="standard-input-box">
                             <span class="input-icon">🔒</span>
-                            <input type="text" id="newWebhookSecret" placeholder="sec_live_token_123">
+                            <select id="newChatAccessMode">
+                                <option value="public" selected>🌐 Public (Open to all visitors)</option>
+                                <option value="private">🔒 Private / Internal (Login required)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-field" id="newInternalKeyField" style="display: none;">
+                        <label>
+                            <span>Internal Team Passcode / Key</span>
+                            <span class="optional-tag" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">Mandatory for Private</span>
+                        </label>
+                        <div class="standard-input-box">
+                            <span class="input-icon">🔑</span>
+                            <input type="password" id="newInternalAccessKey" placeholder="e.g. acme-secret-2025" autocomplete="new-password">
                         </div>
                     </div>
                 </div>
 
                 <div class="form-actions-bar">
-                    <span class="security-note">🔒 SSL Certificate will be provisioned automatically for new subdomains</span>
+                    <span class="security-note">🔒 Isolated container & dedicated automated SSL deployed instantly</span>
                     <button type="submit" class="btn-deploy-tenant">
-                        <span>Deploy Dedicated Subdomain</span>
+                        <span>⚡ Provision Dedicated Workspace</span>
                         <span>➔</span>
                     </button>
                 </div>
             </form>
 
-            <!-- Search & Filter Bar -->
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search by subdomain, brand name, custom domain, or plan..." oninput="filterTenants()">
-            </div>
-
-            <!-- Tenants Table -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-heading);">
-                    Active Workspaces (<span id="tenantCount"><?php echo count($allTenants); ?></span>)
+            <!-- Search and Filter Bar -->
+            <div class="search-and-filter-bar">
+                <div class="search-input-wrapper">
+                    <span class="search-field-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-field-input" placeholder="Search tenant subdomains, brand names, or plans..." oninput="filterTenants()">
+                </div>
+                <div class="workspaces-count-pill">
+                    <span>Workspaces</span>
+                    <span class="count-number" id="tenantCount"><?php echo count($allTenants); ?></span>
                 </div>
             </div>
 
-            <div style="overflow-x: auto;">
+            <!-- Tenants List Table -->
+            <div class="table-responsive-wrapper">
                 <table class="tenant-table">
                     <thead>
                         <tr>
-                            <th>Subdomain & Brand</th>
-                            <th>Plan & Quota</th>
-                            <th>Custom Domain</th>
-                            <th>Status (Kill-Switch)</th>
-                            <th style="text-align: right;">Actions</th>
+                            <th style="width: 32%;">Subdomain Workspace</th>
+                            <th style="width: 30%;">Plan & Quota</th>
+                            <th style="width: 16%; text-align: center;">Status (Kill-Switch)</th>
+                            <th style="width: 22%; text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tenantTableBody">
                         <?php foreach ($allTenants as $t):
                             $sub = htmlspecialchars($t['subdomain']);
                             $isActive = (int) $t['is_active'] === 1;
-                            $hasCustom = !empty($t['custom_domain']);
                             $stats = $t['stats'] ?? Database::getTenantConversationStats($t['subdomain']);
                             $plan = $stats['plan'] ?? $t['plan'] ?? 'starter';
+                            $isEnterprise = strtolower($plan) === 'enterprise';
                             $monthlyConvs = (int) ($stats['monthly_conversations'] ?? 0);
                             $monthlyLimit = (int) ($stats['monthly_limit'] ?? $t['monthly_limit'] ?? 2500);
                             $usagePercent = (float) ($stats['usage_percent'] ?? 0);
                             $barColor = $usagePercent > 90 ? '#ef4444' : ($usagePercent > 70 ? '#f59e0b' : '#10b981');
+                            $accessMode = $t['chat_access_mode'] ?? 'public';
                         ?>
                             <tr class="tenant-row" id="row-<?php echo $sub; ?>"
                                 data-subdomain="<?php echo $sub; ?>"
                                 data-name="<?php echo htmlspecialchars($t['business_name']); ?>"
-                                data-custom-domain="<?php echo htmlspecialchars($t['custom_domain'] ?? ''); ?>"
                                 data-webhook="<?php echo htmlspecialchars($t['webhook_url']); ?>"
                                 data-welcome="<?php echo htmlspecialchars($t['welcome_message']); ?>"
                                 data-color="<?php echo htmlspecialchars($t['theme_color']); ?>"
                                 data-plan="<?php echo htmlspecialchars($plan); ?>"
-                                data-crm-url="<?php echo htmlspecialchars($t['crm_webhook_url'] ?? ''); ?>"
-                                data-crm-secret="<?php echo htmlspecialchars($t['webhook_secret'] ?? ''); ?>"
+                                data-access-mode="<?php echo htmlspecialchars($accessMode); ?>"
+                                data-access-key="<?php echo htmlspecialchars($t['internal_access_key'] ?? ''); ?>"
                                 data-active="<?php echo $isActive ? '1' : '0'; ?>">
 
                                 <td>
                                     <div class="tenant-name-col"><?php echo htmlspecialchars($t['business_name']); ?></div>
                                     <a href="/?subdomain=<?php echo $sub; ?>" target="_blank" class="tenant-domain-link">
-                                        https://<?php echo $sub; ?>.chatmodel.in ↗
+                                        https://<?php echo $sub; ?>.chatmodel.in <span style="font-size: 0.72rem;">↗</span>
                                     </a>
                                 </td>
 
-                                <td style="min-width: 150px;">
-                                    <span class="plan-badge <?php echo htmlspecialchars($plan); ?>"><?php echo strtoupper($plan); ?></span>
-                                    <div style="font-size: 0.75rem; color: var(--text-body);">
-                                        <?php echo number_format($monthlyConvs); ?> / <?php echo $monthlyLimit < 0 ? '∞' : number_format($monthlyLimit); ?> convs
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap;">
+                                        <span class="plan-badge <?php echo htmlspecialchars($plan); ?>"><?php echo strtoupper($plan); ?></span>
+                                        <span class="access-mode-badge <?php echo $accessMode === 'private' ? 'private' : 'public'; ?>">
+                                            <?php echo $accessMode === 'private' ? '🔒 Private' : '🌐 Public'; ?>
+                                        </span>
+                                    </div>
+                                    <div class="quota-text">
+                                        <?php echo number_format($monthlyConvs); ?> / <?php echo $monthlyLimit < 0 ? 'Unlimited' : number_format($monthlyLimit); ?> convs
                                     </div>
                                     <?php if ($monthlyLimit > 0): ?>
                                         <div class="conv-progress-bg">
@@ -361,34 +381,28 @@
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
-                                    <?php if ($hasCustom): ?>
-                                        <span style="color: #0284c7; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
-                                            🌐 <?php echo htmlspecialchars($t['custom_domain']); ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <span style="color: var(--text-body); font-size: 0.78rem;">None (Default)</span>
-                                    <?php endif; ?>
-                                </td>
-
-                                <td>
-                                    <label class="switch" title="Toggle active status">
-                                        <input type="checkbox" <?php echo $isActive ? 'checked' : ''; ?> onchange="toggleTenantStatus('<?php echo $sub; ?>', this.checked)">
-                                        <span class="slider"></span>
-                                    </label>
+                                <td style="text-align: center;">
+                                    <div style="display: inline-flex; align-items: center; justify-content: center;">
+                                        <label class="switch" title="Toggle active / paused status">
+                                            <input type="checkbox" <?php echo $isActive ? 'checked' : ''; ?> onchange="toggleTenantStatus('<?php echo $sub; ?>', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
                                 </td>
 
                                 <td style="text-align: right; white-space: nowrap;">
-                                    <button class="btn-logs" onclick="openLogsModal('<?php echo $sub; ?>')" title="Inspect Live Chat Logs">Logs</button>
-                                    <button class="btn-edit" onclick="openEditModal('<?php echo $sub; ?>')" title="Edit Workspace Settings">Edit</button>
-                                    <button class="btn-delete" onclick="openDeleteModal('<?php echo $sub; ?>')" title="Delete Workspace">Delete</button>
+                                    <button class="btn-logs" onclick="openLogsModal('<?php echo $sub; ?>')" title="Inspect Live Chat Logs">💬 Logs</button>
+                                    <button class="btn-edit" onclick="openResetSubdomainPasswordModal('<?php echo $sub; ?>')" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);" title="Reset Tenant Workspace Password">🔑 Pass</button>
+                                    <button class="btn-edit" onclick="openEditModal('<?php echo $sub; ?>')" title="Edit Workspace Settings">✏️ Edit</button>
+                                    <button class="btn-delete" onclick="openDeleteModal('<?php echo $sub; ?>')" title="Delete Workspace">🗑️ Delete</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-                <div id="noResults" style="display: none; text-align: center; padding: 24px; color: var(--text-body); font-size: 0.9rem;">
-                    No matching subdomains found.
+                <div id="noResults" style="display: none; text-align: center; padding: 36px 20px; color: var(--text-body); font-size: 0.9rem;">
+                    <div style="font-size: 1.6rem; margin-bottom: 6px;">🔍</div>
+                    No matching tenant subdomains found.
                 </div>
             </div>
         </div>

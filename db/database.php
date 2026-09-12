@@ -44,16 +44,14 @@ class Database {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 subdomain TEXT NOT NULL UNIQUE,
                 password_hash TEXT DEFAULT '',
-                custom_domain TEXT DEFAULT '',
                 business_name TEXT NOT NULL,
                 webhook_url TEXT NOT NULL,
                 welcome_message TEXT DEFAULT 'Hello! How can we help your business today?',
                 theme_color TEXT DEFAULT '#4f46e5',
                 plan TEXT DEFAULT 'starter',
                 monthly_limit INTEGER DEFAULT 2500,
-                crm_webhook_url TEXT DEFAULT '',
-                webhook_secret TEXT DEFAULT '',
-                crm_events TEXT DEFAULT 'lead_capture,escalation',
+                chat_access_mode TEXT DEFAULT 'public',
+                internal_access_key TEXT DEFAULT '',
                 is_active INTEGER DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -82,35 +80,6 @@ class Database {
             );
         ");
 
-        // Schema migration check for existing columns
-        try {
-            $cols = $db->query("PRAGMA table_info(tenants)")->fetchAll();
-            $colNames = array_column($cols, 'name');
-            if (!in_array('password_hash', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN password_hash TEXT DEFAULT ''");
-            }
-            if (!in_array('custom_domain', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN custom_domain TEXT DEFAULT ''");
-            }
-            if (!in_array('plan', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN plan TEXT DEFAULT 'starter'");
-            }
-            if (!in_array('monthly_limit', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN monthly_limit INTEGER DEFAULT 2500");
-            }
-            if (!in_array('crm_webhook_url', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN crm_webhook_url TEXT DEFAULT ''");
-            }
-            if (!in_array('webhook_secret', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN webhook_secret TEXT DEFAULT ''");
-            }
-            if (!in_array('crm_events', $colNames)) {
-                $db->exec("ALTER TABLE tenants ADD COLUMN crm_events TEXT DEFAULT 'lead_capture,escalation'");
-            }
-        } catch (Exception $e) {
-            // Migration safe ignore
-        }
-
         // Seed default admin user if none exists
         $adminStmt = $db->query("SELECT COUNT(*) as cnt FROM admins");
         $adminCount = $adminStmt->fetch()['cnt'] ?? 0;
@@ -122,31 +91,62 @@ class Database {
         $stmt = $db->query("SELECT COUNT(*) as cnt FROM tenants");
         $count = $stmt->fetch()['cnt'] ?? 0;
         if ($count == 0) {
-            self::createTenant(
-                'aditya',
-                'Aditya Enterprise Automation',
-                'https://api.chatmodel.in/webhook/chat-aditya',
-                'Welcome to Aditya AI Assistant! Ask me anything about our automated enterprise services.',
-                '#3b82f6',
-                'professional',
-                15000,
-                'https://api.chatmodel.in/webhook/crm-aditya-leads',
-                'sec_live_aditya99',
-                'lead_capture,escalation',
-                1
-            );
+            // 1. Starter Plan Tenant (Public mode default)
             self::createTenant(
                 'demo',
                 'ChatModel Demo Store',
                 'https://api.chatmodel.in/webhook/chat-demo',
-                'Hi! I am your 24/7 AI Sales Representative. How may I assist your business today?',
+                'Hi! Welcome to ChatModel Demo Store. How may I assist your business today?',
                 '#6366f1',
                 'starter',
                 2500,
-                '',
-                '',
-                'lead_capture',
-                1
+                1,
+                'public',
+                ''
+            );
+
+            // 2. Professional Plan Tenant (Configurable Public/Private)
+            self::createTenant(
+                'aditya',
+                'Aditya Logistics Automation',
+                'https://api.chatmodel.in/webhook/chat-aditya',
+                'Welcome to Aditya AI Assistant! Ask me anything about our automated enterprise delivery & tracking services.',
+                '#0284c7',
+                'professional',
+                15000,
+                1,
+                'public',
+                'aditya-team-2026'
+            );
+
+            // 3. Enterprise Plan Tenant (Dedicated Webhook, Logs & Private Passcode)
+            self::createTenant(
+                'enterprise',
+                'Apex Enterprise Global Corp',
+                'https://api.chatmodel.in/webhook/chat-enterprise-apex',
+                'Welcome to Apex Enterprise Global Concierge. Secure confidential communications channel active.',
+                '#a855f7',
+                'enterprise',
+                -1,
+                1,
+                'private',
+                'apex-secret-2026'
+            );
+
+            // Seed demo chat logs for enterprise & aditya
+            self::logMessage('enterprise', 'sess_corp_001', 'user', 'Hello, we would like to initiate custom ERP sync.');
+            self::logMessage('enterprise', 'sess_corp_001', 'bot', 'Greetings! Your dedicated Enterprise AI pipeline is online. ERP data bridges are synchronized.');
+            self::logMessage('aditya', 'sess_aditya_101', 'user', 'Can I track shipment CM-8921?');
+            self::logMessage('aditya', 'sess_aditya_101', 'bot', 'Shipment CM-8921 is in transit and estimated for delivery by 5:00 PM today.');
+
+            // Seed a sample client inquiry
+            self::createInquiry(
+                'Rajesh Sharma',
+                'rajesh@apexventures.com',
+                '+91 98765 43210',
+                'Apex Ventures',
+                'enterprise',
+                'Interested in deploying 5 dedicated subdomain workspaces for our subsidiary companies.'
             );
         }
     }
@@ -185,8 +185,8 @@ class Database {
     public static function verifyTenantUser(string $login, string $password): ?array {
         $login = strtolower(trim($login));
         $db = self::getConnection();
-        $stmt = $db->prepare("SELECT * FROM tenants WHERE LOWER(subdomain) = :sub OR LOWER(custom_domain) = :cd LIMIT 1");
-        $stmt->execute([':sub' => $login, ':cd' => $login]);
+        $stmt = $db->prepare("SELECT * FROM tenants WHERE LOWER(subdomain) = :sub LIMIT 1");
+        $stmt->execute([':sub' => $login]);
         $tenant = $stmt->fetch();
 
         if ($tenant) {
@@ -281,16 +281,6 @@ class Database {
         return $result ? $result : null;
     }
 
-    public static function getTenantByCustomDomain(string $customDomain): ?array {
-        $customDomain = strtolower(trim($customDomain));
-        if (empty($customDomain)) return null;
-        $db = self::getConnection();
-        $stmt = $db->prepare("SELECT * FROM tenants WHERE LOWER(custom_domain) = :custom_domain LIMIT 1");
-        $stmt->execute([':custom_domain' => $customDomain]);
-        $result = $stmt->fetch();
-        return $result ? $result : null;
-    }
-
     public static function isSubdomainAvailable(string $subdomain): array {
         $subdomain = strtolower(preg_replace('/[^a-zA-Z0-9-]/', '', trim($subdomain)));
         
@@ -339,6 +329,33 @@ class Database {
         return !$stats['is_over_quota'];
     }
 
+    public static function verifyChatAccess(string $subdomain, string $passcodeOrPassword): bool {
+        $subdomain = strtolower(trim($subdomain));
+        $passcodeOrPassword = trim($passcodeOrPassword);
+        if (empty($passcodeOrPassword)) return false;
+
+        $tenant = self::getTenantBySubdomain($subdomain);
+        if (!$tenant) return false;
+
+        // 1. Check dedicated internal access key if configured
+        if (!empty($tenant['internal_access_key']) && hash_equals($tenant['internal_access_key'], $passcodeOrPassword)) {
+            return true;
+        }
+
+        // 2. Check tenant password_hash or default password
+        if (empty($tenant['password_hash'])) {
+            if ($passcodeOrPassword === 'client123' || strtolower($passcodeOrPassword) === strtolower($tenant['subdomain'])) {
+                return true;
+            }
+        } else {
+            if (password_verify($passcodeOrPassword, $tenant['password_hash'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function createTenant(
         string $subdomain,
         string $businessName,
@@ -347,11 +364,9 @@ class Database {
         string $themeColor = '#4f46e5',
         string $plan = 'starter',
         int $monthlyLimit = 2500,
-        string $crmWebhookUrl = '',
-        string $webhookSecret = '',
-        string $crmEvents = 'lead_capture,escalation',
         int $isActive = 1,
-        string $customDomain = ''
+        string $chatAccessMode = 'public',
+        string $internalAccessKey = ''
     ): bool {
         $db = self::getConnection();
         $subdomain = strtolower(preg_replace('/[^a-zA-Z0-9-]/', '', trim($subdomain)));
@@ -361,22 +376,25 @@ class Database {
         if ($plan === 'professional' && $monthlyLimit == 2500) $monthlyLimit = 15000;
         if ($plan === 'enterprise') $monthlyLimit = -1;
 
+        $validModes = ['public', 'private'];
+        if (!in_array($chatAccessMode, $validModes)) {
+            $chatAccessMode = 'public';
+        }
+
         $stmt = $db->prepare("
-            INSERT INTO tenants (subdomain, custom_domain, business_name, webhook_url, welcome_message, theme_color, plan, monthly_limit, crm_webhook_url, webhook_secret, crm_events, is_active)
-            VALUES (:subdomain, :custom_domain, :business_name, :webhook_url, :welcome_message, :theme_color, :plan, :monthly_limit, :crm_webhook_url, :webhook_secret, :crm_events, :is_active)
+            INSERT INTO tenants (subdomain, business_name, webhook_url, welcome_message, theme_color, plan, monthly_limit, chat_access_mode, internal_access_key, is_active)
+            VALUES (:subdomain, :business_name, :webhook_url, :welcome_message, :theme_color, :plan, :monthly_limit, :chat_access_mode, :internal_access_key, :is_active)
         ");
         return $stmt->execute([
             ':subdomain' => $subdomain,
-            ':custom_domain' => strtolower(trim($customDomain)),
             ':business_name' => $businessName,
             ':webhook_url' => $webhookUrl,
             ':welcome_message' => $welcomeMessage,
             ':theme_color' => $themeColor,
             ':plan' => $plan,
             ':monthly_limit' => $monthlyLimit,
-            ':crm_webhook_url' => trim($crmWebhookUrl),
-            ':webhook_secret' => trim($webhookSecret),
-            ':crm_events' => trim($crmEvents),
+            ':chat_access_mode' => $chatAccessMode,
+            ':internal_access_key' => trim($internalAccessKey),
             ':is_active' => $isActive
         ]);
     }
@@ -398,43 +416,42 @@ class Database {
         string $themeColor,
         string $plan = 'starter',
         int $monthlyLimit = 2500,
-        string $crmWebhookUrl = '',
-        string $webhookSecret = '',
-        string $crmEvents = 'lead_capture,escalation',
         int $isActive = 1,
-        string $customDomain = ''
+        string $chatAccessMode = 'public',
+        string $internalAccessKey = ''
     ): bool {
         $db = self::getConnection();
         if ($plan === 'professional' && $monthlyLimit == 2500) $monthlyLimit = 15000;
         if ($plan === 'enterprise') $monthlyLimit = -1;
 
+        $validModes = ['public', 'private'];
+        if (!in_array($chatAccessMode, $validModes)) {
+            $chatAccessMode = 'public';
+        }
+
         $stmt = $db->prepare("
             UPDATE tenants 
-            SET custom_domain = :custom_domain,
-                business_name = :business_name,
+            SET business_name = :business_name,
                 webhook_url = :webhook_url,
                 welcome_message = :welcome_message,
                 theme_color = :theme_color,
                 plan = :plan,
                 monthly_limit = :monthly_limit,
-                crm_webhook_url = :crm_webhook_url,
-                webhook_secret = :webhook_secret,
-                crm_events = :crm_events,
+                chat_access_mode = :chat_access_mode,
+                internal_access_key = :internal_access_key,
                 is_active = :is_active,
                 updated_at = CURRENT_TIMESTAMP
             WHERE subdomain = :subdomain
         ");
         return $stmt->execute([
-            ':custom_domain' => strtolower(trim($customDomain)),
             ':business_name' => $businessName,
             ':webhook_url' => $webhookUrl,
             ':welcome_message' => $welcomeMessage,
             ':theme_color' => $themeColor,
             ':plan' => $plan,
             ':monthly_limit' => $monthlyLimit,
-            ':crm_webhook_url' => trim($crmWebhookUrl),
-            ':webhook_secret' => trim($webhookSecret),
-            ':crm_events' => trim($crmEvents),
+            ':chat_access_mode' => $chatAccessMode,
+            ':internal_access_key' => trim($internalAccessKey),
             ':is_active' => $isActive ? 1 : 0,
             ':subdomain' => strtolower(trim($subdomain))
         ]);

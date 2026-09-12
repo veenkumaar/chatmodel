@@ -24,3 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function openForgotHelpModal() {
+    const modal = document.getElementById('forgotHelpModal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeForgotHelpModal() {
+    const modal = document.getElementById('forgotHelpModal');
+    if (modal) modal.classList.remove('active');
+}

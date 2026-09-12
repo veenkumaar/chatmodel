@@ -353,3 +353,176 @@ body {
     text-decoration: none;
     font-weight: 600;
 }
+
+/* Chat Header Action Controls & Badges */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-status-btn {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+
+.auth-status-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+}
+
+.auth-status-btn.active {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #34d399;
+}
+
+/* Authentication Gate Container (Private Mode Lock Screen) */
+.auth-gate-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    background: var(--card-bg);
+    text-align: center;
+    animation: fadeInAuth 0.3s ease;
+}
+
+.auth-card {
+    max-width: 360px;
+    width: 100%;
+    background: var(--bot-bubble);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.auth-card-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--tenant-color), #312e81);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin: 0 auto 16px auto;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.auth-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 6px;
+}
+
+.auth-card-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.45;
+}
+
+.auth-input-group {
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+.auth-input-group label {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.auth-input:focus {
+    border-color: var(--tenant-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.btn-unlock {
+    width: 100%;
+    padding: 12px;
+    background: var(--tenant-color);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-unlock:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.auth-error-msg {
+    color: #ef4444;
+    font-size: 0.78rem;
+    margin-top: 10px;
+    display: none;
+    padding: 6px 10px;
+    background: rgba(239, 68, 68, 0.12);
+    border-radius: 8px;
+}
+
+/* Modal for Hybrid / Team Login */
+.auth-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 9999;
+}
+
+.auth-modal-overlay.active {
+    display: flex;
+    animation: fadeInAuth 0.2s ease;
+}
+
+@keyframes fadeInAuth {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+

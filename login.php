@@ -8,6 +8,7 @@ require_once __DIR__ . '/db/security.php';
 
 Security::startSecureSession();
 Security::applySecurityHeaders(false); // Disallow iframe framing on admin/login portal to prevent clickjacking
+header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet', true);
 
 $error = null;
 $success = null;

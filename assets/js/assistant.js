@@ -2,6 +2,87 @@
  * ChatModel SaaS - Tenant AI Assistant Client Logic
  */
 
+// Internal session logout
+async function handleChatLogout() {
+    const subdomain = window.TENANT_SUBDOMAIN || '';
+    try {
+        await fetch('/api/tenants.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'chat_logout',
+                subdomain: subdomain
+            })
+        });
+    } catch (e) {}
+    window.location.reload();
+}
+
+// Authentication gate submit (Private mode)
+async function handleChatLoginSubmit(e) {
+    e.preventDefault();
+    const passwordInput = document.getElementById('chatPasswordInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const errDiv = document.getElementById('authErrorMsg');
+    const subdomain = window.TENANT_SUBDOMAIN || '';
+    const password = passwordInput ? passwordInput.value.trim() : '';
+
+    if (!password) return;
+
+    if (unlockBtn) {
+        unlockBtn.disabled = true;
+        unlockBtn.textContent = 'Verifying access...';
+    }
+    if (errDiv) errDiv.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/tenants.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'verify_chat_access',
+                subdomain: subdomain,
+                password: password
+            })
+        });
+        const data = await res.json();
+
+        if (data.success && data.authenticated) {
+            window.IS_CHAT_AUTHENTICATED = true;
+            const authGate = document.getElementById('authGate');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInputContainer = document.getElementById('chatInputContainer');
+            const headerStatusText = document.getElementById('headerStatusText');
+
+            if (authGate) authGate.style.display = 'none';
+            if (chatMessages) chatMessages.style.display = 'flex';
+            if (chatInputContainer) chatInputContainer.style.display = 'flex';
+            if (headerStatusText) headerStatusText.textContent = 'Internal Team Session';
+
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) setTimeout(() => chatInput.focus(), 100);
+        } else {
+            if (errDiv) {
+                errDiv.textContent = data.error || 'Invalid passcode. Please try again.';
+                errDiv.style.display = 'block';
+            }
+            if (unlockBtn) {
+                unlockBtn.disabled = false;
+                unlockBtn.innerHTML = '<span>Unlock AI Assistant</span><span>➔</span>';
+            }
+        }
+    } catch (err) {
+        if (errDiv) {
+            errDiv.textContent = 'Server verification failed. Please try again.';
+            errDiv.style.display = 'block';
+        }
+        if (unlockBtn) {
+            unlockBtn.disabled = false;
+            unlockBtn.innerHTML = '<span>Unlock AI Assistant</span><span>➔</span>';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
@@ -36,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addMessage(text, sender) {
+        if (!chatMessages) return;
         const div = document.createElement('div');
         div.classList.add('message', sender);
         if (sender === 'bot') {
@@ -43,11 +125,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             div.textContent = text;
         }
-        chatMessages.insertBefore(div, loadingIndicator);
+        if (loadingIndicator) {
+            chatMessages.insertBefore(div, loadingIndicator);
+        } else {
+            chatMessages.appendChild(div);
+        }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     function renderQuickReplies(replies) {
+        if (!chatMessages) return;
         const container = document.createElement('div');
         container.classList.add('quick-replies');
         replies.forEach(reply => {
@@ -57,11 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.onclick = () => sendMessage(reply);
             container.appendChild(btn);
         });
-        chatMessages.insertBefore(container, loadingIndicator);
+        if (loadingIndicator) {
+            chatMessages.insertBefore(container, loadingIndicator);
+        } else {
+            chatMessages.appendChild(container);
+        }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     async function sendMessage(overrideText = null) {
+        if (!chatInput) return;
         const text = typeof overrideText === 'string' ? overrideText : chatInput.value.trim();
         if (!text) return;
 
@@ -69,10 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage(text, 'user');
         if (typeof overrideText !== 'string') chatInput.value = '';
 
-        loadingIndicator.classList.add('active');
+        if (loadingIndicator) loadingIndicator.classList.add('active');
         chatInput.disabled = true;
-        sendBtn.disabled = true;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (sendBtn) sendBtn.disabled = true;
+        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
 
         try {
             const res = await fetch('/api/chat.php', {
@@ -86,10 +178,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await res.json();
-            loadingIndicator.classList.remove('active');
+            if (loadingIndicator) loadingIndicator.classList.remove('active');
             chatInput.disabled = false;
-            sendBtn.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
             chatInput.focus();
+
+            if (res.status === 401 && data.auth_required) {
+                window.location.reload();
+                return;
+            }
 
             if (!res.ok) {
                 addMessage(data.error || 'Unable to connect to assistant.', 'bot');
@@ -103,9 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderQuickReplies(data.quick_replies);
             }
         } catch (err) {
-            loadingIndicator.classList.remove('active');
+            if (loadingIndicator) loadingIndicator.classList.remove('active');
             chatInput.disabled = false;
-            sendBtn.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
             addMessage('Connection error. Please try again.', 'bot');
         }
     }

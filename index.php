@@ -31,18 +31,15 @@ if ($subdomainOverride) {
     if ($matched !== 'www' && $matched !== 'n8n' && $matched !== 'admin') {
         $subdomain = $matched;
     }
-} elseif ($host !== 'chatmodel.in' && $host !== 'www.chatmodel.in' && $host !== 'localhost' && $host !== '127.0.0.1') {
-    // Custom dedicated CNAME domain resolution (e.g., chat.clientbrand.com)
-    $customTenant = Database::getTenantByCustomDomain($host);
-    if ($customTenant) {
-        $subdomain = $customTenant['subdomain'];
-    }
 }
 
 // -------------------------------------------------------------
 // SCENARIO 1: SUBDOMAIN TENANT VIEW (e.g., aditya.chatmodel.in)
 // -------------------------------------------------------------
 if (!empty($subdomain)) {
+    // Send HTTP-level anti-indexing header for all tenant subdomains
+    header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet', true);
+
     $tenant = Database::getTenantBySubdomain($subdomain);
 
     // Check if tenant exists
@@ -63,6 +60,9 @@ if (!empty($subdomain)) {
         require __DIR__ . '/views/errors/403.php';
         exit;
     }
+
+    $chatAccessMode = $tenant['chat_access_mode'] ?? 'public';
+    $isChatAuthenticated = !empty($_SESSION['chatmodel_chat_authenticated_' . $subdomain]);
 
     // Tenant Active - Render dedicated chat UI
     require __DIR__ . '/views/assistant/chat_interface.php';

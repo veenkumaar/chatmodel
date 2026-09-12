@@ -79,67 +79,6 @@ async function checkSubdomainAvailability(slug) {
     }, 300);
 }
 
-// Verify Custom Domain CNAME DNS
-async function verifyDnsDomain(mode) {
-    const domainInput = mode === 'edit' ? document.getElementById('editCustomDomain') : document.getElementById('newCustomDomain');
-    const subdomain = mode === 'edit' ? document.getElementById('editSubdomain').value : document.getElementById('newSubdomain').value;
-    const statusDiv = mode === 'edit' ? document.getElementById('editDnsStatus') : null;
-    const domain = domainInput ? domainInput.value.trim() : '';
-
-    if (!domain) {
-        alert('Please enter a custom domain first (e.g. chat.yourbrand.com).');
-        return;
-    }
-
-    if (statusDiv) {
-        statusDiv.style.display = 'block';
-        statusDiv.style.background = 'rgba(2, 132, 199, 0.1)';
-        statusDiv.style.color = '#0284c7';
-        statusDiv.textContent = '⏳ Querying global DNS records for ' + domain + '...';
-    }
-
-    try {
-        const res = await fetch('/api/tenants.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'verify_custom_domain',
-                custom_domain: domain,
-                subdomain: subdomain
-            })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            if (statusDiv) {
-                if (data.cname_matched) {
-                    statusDiv.style.background = 'rgba(16, 185, 129, 0.15)';
-                    statusDiv.style.color = '#10b981';
-                    statusDiv.innerHTML = `✅ <strong>DNS Verified!</strong> CNAME correctly points to <code>${data.detected_cname}</code>`;
-                } else {
-                    statusDiv.style.background = 'rgba(245, 158, 11, 0.15)';
-                    statusDiv.style.color = '#f59e0b';
-                    statusDiv.innerHTML = `⚠️ <strong>DNS Pending:</strong> ${data.instructions}<br>Current target: <code>${data.detected_cname || data.detected_ip || 'None detected yet'}</code>`;
-                }
-            } else {
-                showToast(data.cname_matched ? '✅ CNAME DNS Verified!' : '⚠️ CNAME DNS Pending propagation');
-            }
-        } else {
-            if (statusDiv) {
-                statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
-                statusDiv.style.color = '#ef4444';
-                statusDiv.textContent = '❌ ' + (data.error || 'DNS Lookup failed.');
-            }
-        }
-    } catch (err) {
-        if (statusDiv) {
-            statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
-            statusDiv.style.color = '#ef4444';
-            statusDiv.textContent = '❌ DNS test query failed.';
-        }
-    }
-}
-
 // Instant Live Search Filter
 function filterTenants() {
     const searchInput = document.getElementById('searchInput');
@@ -150,9 +89,8 @@ function filterTenants() {
 
     rows.forEach(row => {
         const subdomain = row.getAttribute('data-subdomain').toLowerCase();
-        const customDomain = (row.getAttribute('data-custom-domain') || '').toLowerCase();
         const name = row.getAttribute('data-name').toLowerCase();
-        if (subdomain.includes(query) || name.includes(query) || customDomain.includes(query)) {
+        if (subdomain.includes(query) || name.includes(query)) {
             row.style.display = '';
             visibleCount++;
         } else {
@@ -173,16 +111,17 @@ function openEditModal(subdomain) {
 
     document.getElementById('editSubdomain').value = subdomain;
     document.getElementById('editSubdomainLabel').textContent = subdomain + '.chatmodel.in';
-    document.getElementById('editCustomDomain').value = row.getAttribute('data-custom-domain') || '';
     document.getElementById('editBusinessName').value = row.getAttribute('data-name') || '';
     document.getElementById('editWebhookUrl').value = row.getAttribute('data-webhook') || '';
     document.getElementById('editWelcomeMessage').value = row.getAttribute('data-welcome') || '';
     document.getElementById('editThemeColor').value = row.getAttribute('data-color') || '#4f46e5';
     document.getElementById('editPlan').value = row.getAttribute('data-plan') || 'starter';
-    document.getElementById('editCrmWebhookUrl').value = row.getAttribute('data-crm-url') || '';
-    document.getElementById('editWebhookSecret').value = row.getAttribute('data-crm-secret') || '';
-    document.getElementById('editCrmStatus').style.display = 'none';
-    document.getElementById('editDnsStatus').style.display = 'none';
+    if (document.getElementById('editChatAccessMode')) {
+        document.getElementById('editChatAccessMode').value = row.getAttribute('data-access-mode') || 'public';
+    }
+    if (document.getElementById('editInternalAccessKey')) {
+        document.getElementById('editInternalAccessKey').value = row.getAttribute('data-access-key') || '';
+    }
 
     document.getElementById('editModal').classList.add('active');
 }
@@ -190,64 +129,6 @@ function openEditModal(subdomain) {
 function closeEditModal() {
     const modal = document.getElementById('editModal');
     if (modal) modal.classList.remove('active');
-}
-
-// Test CRM Webhook Pipeline
-async function testCrmPipeline(mode) {
-    const urlInput = mode === 'edit' ? document.getElementById('editCrmWebhookUrl') : document.getElementById('newCrmWebhookUrl');
-    const secretInput = mode === 'edit' ? document.getElementById('editWebhookSecret') : document.getElementById('newWebhookSecret');
-    const statusDiv = mode === 'edit' ? document.getElementById('editCrmStatus') : null;
-
-    const crmUrl = urlInput ? urlInput.value.trim() : '';
-    const secret = secretInput ? secretInput.value.trim() : '';
-
-    if (!crmUrl) {
-        alert('Please enter a valid CRM Webhook URL first.');
-        return;
-    }
-
-    if (statusDiv) {
-        statusDiv.style.display = 'block';
-        statusDiv.style.color = '#0284c7';
-        statusDiv.textContent = '⏳ Dispatching verification payload to CRM pipeline...';
-    }
-
-    try {
-        const res = await fetch('/api/tenants.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'test_crm_pipeline',
-                crm_webhook_url: crmUrl,
-                webhook_secret: secret,
-                subdomain: 'test'
-            })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            const msg = `✅ CRM Connected! HTTP ${data.http_code} (${data.latency_ms}ms)`;
-            if (statusDiv) {
-                statusDiv.style.color = '#10b981';
-                statusDiv.textContent = msg;
-            } else {
-                showToast(msg);
-            }
-        } else {
-            const errMsg = `❌ CRM Ping Failed: ${data.error || 'Check endpoint URL'}`;
-            if (statusDiv) {
-                statusDiv.style.color = '#ef4444';
-                statusDiv.textContent = errMsg;
-            } else {
-                alert(errMsg);
-            }
-        }
-    } catch (err) {
-        if (statusDiv) {
-            statusDiv.style.color = '#ef4444';
-            statusDiv.textContent = '❌ Failed to reach backend test dispatcher.';
-        }
-    }
 }
 
 // Conversation Logs Modal Inspector
@@ -364,14 +245,20 @@ async function executeDeleteTenant() {
 async function handleSaveEdit(e) {
     e.preventDefault();
     const subdomain = document.getElementById('editSubdomain').value;
-    const customDomain = document.getElementById('editCustomDomain').value.trim();
     const businessName = document.getElementById('editBusinessName').value.trim();
     const webhookUrl = document.getElementById('editWebhookUrl').value.trim();
     const welcomeMessage = document.getElementById('editWelcomeMessage').value.trim();
     const themeColor = document.getElementById('editThemeColor').value;
     const plan = document.getElementById('editPlan').value;
-    const crmWebhookUrl = document.getElementById('editCrmWebhookUrl').value.trim();
-    const webhookSecret = document.getElementById('editWebhookSecret').value.trim();
+    const chatAccessMode = document.getElementById('editChatAccessMode') ? document.getElementById('editChatAccessMode').value : 'public';
+    const internalAccessKey = document.getElementById('editInternalAccessKey') ? document.getElementById('editInternalAccessKey').value.trim() : '';
+
+    if (chatAccessMode === 'private' && !internalAccessKey) {
+        alert('A Dedicated Internal Team Passcode / Key is mandatory when choosing Private mode.');
+        const el = document.getElementById('editInternalAccessKey');
+        if (el) el.focus();
+        return;
+    }
 
     const row = document.getElementById('row-' + subdomain);
     const isActive = row ? parseInt(row.getAttribute('data-active')) : 1;
@@ -383,14 +270,13 @@ async function handleSaveEdit(e) {
             body: JSON.stringify({
                 action: 'update',
                 subdomain: subdomain,
-                custom_domain: customDomain,
                 business_name: businessName,
                 webhook_url: webhookUrl,
                 welcome_message: welcomeMessage,
                 theme_color: themeColor,
                 plan: plan,
-                crm_webhook_url: crmWebhookUrl,
-                webhook_secret: webhookSecret,
+                chat_access_mode: chatAccessMode,
+                internal_access_key: internalAccessKey,
                 is_active: isActive
             })
         });
@@ -434,13 +320,19 @@ async function toggleTenantStatus(subdomain, isChecked) {
 async function handleCreateTenant(e) {
     e.preventDefault();
     const subdomain = document.getElementById('newSubdomain').value.trim();
-    const customDomain = document.getElementById('newCustomDomain').value.trim();
     const businessName = document.getElementById('newBusinessName').value.trim();
     const webhookUrl = document.getElementById('newWebhookUrl').value.trim();
     const themeColor = document.getElementById('newThemeColor').value;
     const plan = document.getElementById('newPlan').value;
-    const crmWebhookUrl = document.getElementById('newCrmWebhookUrl').value.trim();
-    const webhookSecret = document.getElementById('newWebhookSecret').value.trim();
+    const chatAccessMode = document.getElementById('newChatAccessMode') ? document.getElementById('newChatAccessMode').value : 'public';
+    const internalAccessKey = document.getElementById('newInternalAccessKey') ? document.getElementById('newInternalAccessKey').value.trim() : '';
+
+    if (chatAccessMode === 'private' && !internalAccessKey) {
+        alert('A Dedicated Internal Team Passcode / Key is mandatory when choosing Private mode.');
+        const el = document.getElementById('newInternalAccessKey');
+        if (el) el.focus();
+        return;
+    }
 
     try {
         const res = await fetch('/api/tenants.php', {
@@ -449,13 +341,12 @@ async function handleCreateTenant(e) {
             body: JSON.stringify({
                 action: 'create',
                 subdomain: subdomain,
-                custom_domain: customDomain,
                 business_name: businessName,
                 webhook_url: webhookUrl,
                 theme_color: themeColor,
                 plan: plan,
-                crm_webhook_url: crmWebhookUrl,
-                webhook_secret: webhookSecret,
+                chat_access_mode: chatAccessMode,
+                internal_access_key: internalAccessKey,
                 is_active: 1
             })
         });
@@ -590,6 +481,86 @@ async function handleAdminPasswordChange(e) {
             statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
             statusDiv.style.color = '#ef4444';
             statusDiv.textContent = '❌ ' + (data.error || 'Failed to update password.');
+        }
+    } catch (err) {
+        statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusDiv.style.color = '#ef4444';
+        statusDiv.textContent = '❌ Server communication error.';
+    }
+}
+
+// Subdomain Password Reset Management (Admin)
+function openResetSubdomainPasswordModal(subdomain) {
+    const modal = document.getElementById('resetSubdomainPasswordModal');
+    const form = document.getElementById('resetSubdomainPasswordForm');
+    const targetInput = document.getElementById('resetTargetSubdomain');
+    const display = document.getElementById('resetSubdomainDisplay');
+    const status = document.getElementById('resetPasswordStatus');
+    
+    if (form) form.reset();
+    if (status) status.style.display = 'none';
+    if (targetInput) targetInput.value = subdomain;
+    if (display) display.textContent = `${subdomain}.chatmodel.in`;
+    if (modal) modal.classList.add('active');
+}
+
+function closeResetSubdomainPasswordModal() {
+    const modal = document.getElementById('resetSubdomainPasswordModal');
+    if (modal) modal.classList.remove('active');
+}
+
+async function handleResetSubdomainPassword(e) {
+    e.preventDefault();
+    const subdomain = document.getElementById('resetTargetSubdomain').value.trim();
+    const newPassword = document.getElementById('resetNewPassword').value.trim();
+    const confirmPassword = document.getElementById('resetConfirmPassword').value.trim();
+    const statusDiv = document.getElementById('resetPasswordStatus');
+
+    if (newPassword.length < 6) {
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusDiv.style.color = '#ef4444';
+        statusDiv.textContent = '❌ New password must be at least 6 characters long.';
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusDiv.style.color = '#ef4444';
+        statusDiv.textContent = '❌ Passwords do not match. Please re-type.';
+        return;
+    }
+
+    statusDiv.style.display = 'block';
+    statusDiv.style.background = 'rgba(99, 102, 241, 0.1)';
+    statusDiv.style.color = '#818cf8';
+    statusDiv.textContent = `⏳ Setting new password for ${subdomain}...`;
+
+    try {
+        const res = await fetch('/api/tenants.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'update_password',
+                subdomain: subdomain,
+                new_password: newPassword
+            })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            statusDiv.style.background = 'rgba(16, 185, 129, 0.15)';
+            statusDiv.style.color = '#10b981';
+            statusDiv.textContent = `✅ Password for '${subdomain}' reset successfully!`;
+            showToast(`Password for '${subdomain}' reset successfully!`);
+            setTimeout(() => {
+                closeResetSubdomainPasswordModal();
+            }, 1200);
+        } else {
+            statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+            statusDiv.style.color = '#ef4444';
+            statusDiv.textContent = '❌ ' + (data.error || 'Failed to update workspace password.');
         }
     } catch (err) {
         statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';

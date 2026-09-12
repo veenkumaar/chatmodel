@@ -63,7 +63,7 @@ async function sendDemoMessage() {
         const reply = data.output || data.response || data.text || data.message || 'Assistant response generated successfully.';
         botDiv.innerHTML = DOMPurify.sanitize(marked.parse(reply));
     } catch (err) {
-        botDiv.textContent = "Thank you! With ChatModel's conversational AI engine, your business can answer questions like this instantly with 0ms delay and sync CRM records directly.";
+        botDiv.textContent = "Thank you! With ChatModel's conversational AI engine, your business can answer questions like this instantly with 0ms delay.";
     }
     demoMessages.scrollTop = demoMessages.scrollHeight;
 }
@@ -192,5 +192,22 @@ function selectPricingPlan(planCode, planName) {
             nameInput.focus();
         }
     }, 500);
+}
+
+// FAQ Accordion Interaction
+function toggleFaq(headerElement) {
+    const parentItem = headerElement.closest('.faq-item');
+    if (!parentItem) return;
+
+    const isActive = parentItem.classList.contains('active');
+    
+    // Close other items for single-accordion UX
+    document.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    if (!isActive) {
+        parentItem.classList.add('active');
+    }
 }
 

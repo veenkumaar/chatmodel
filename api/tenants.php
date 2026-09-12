@@ -56,11 +56,17 @@ try {
         if (isset($_GET['action']) && $_GET['action'] === 'get_logs') {
             $subdomain = strtolower(trim($_GET['subdomain'] ?? ''));
             
-            // Check auth: Admin can view any, user can only view their own
+            // Check auth: Admin can view any, user can only view their own if they are on enterprise plan
             if (!isAdminLoggedIn()) {
                 if (!isUserLoggedIn() || getCurrentUserSubdomain() !== $subdomain) {
                     http_response_code(403);
                     echo json_encode(['error' => 'Unauthorized']);
+                    exit;
+                }
+                $tenant = Database::getTenantBySubdomain($subdomain);
+                if (!$tenant || strtolower($tenant['plan'] ?? '') !== 'enterprise') {
+                    http_response_code(403);
+                    echo json_encode(['error' => 'Live Conversation Logs are exclusive to Agency & Enterprise workspaces.']);
                     exit;
                 }
             }
@@ -197,6 +203,54 @@ try {
             $id = (int)($data['id'] ?? 0);
             $deleted = Database::deleteInquiry($id);
             echo json_encode(['success' => $deleted, 'message' => 'Inquiry record removed.']);
+            exit;
+        }
+
+        // Chat Interface Authentication (Internal/Private Assistant Access)
+        if ($action === 'verify_chat_access') {
+            if (!Security::checkRateLimit('chat_auth_attempt', 10, 60)) {
+                http_response_code(429);
+                echo json_encode(['error' => 'Too many login attempts. Please wait 1 minute.']);
+                exit;
+            }
+
+            $subdomain = Security::sanitizeSlug($data['subdomain'] ?? '');
+            $password = trim($data['password'] ?? '');
+
+            if (empty($subdomain) || empty($password)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Subdomain and password/passcode are required.']);
+                exit;
+            }
+
+            $isValid = Database::verifyChatAccess($subdomain, $password);
+            if ($isValid) {
+                $_SESSION['chatmodel_chat_authenticated_' . $subdomain] = true;
+                $_SESSION['chatmodel_chat_time_' . $subdomain] = time();
+                echo json_encode([
+                    'success' => true,
+                    'authenticated' => true,
+                    'subdomain' => $subdomain,
+                    'message' => 'Internal chat session unlocked successfully!'
+                ]);
+            } else {
+                http_response_code(401);
+                echo json_encode([
+                    'success' => false,
+                    'authenticated' => false,
+                    'error' => 'Invalid passcode or password. Please try again.'
+                ]);
+            }
+            exit;
+        }
+
+        if ($action === 'chat_logout') {
+            $subdomain = Security::sanitizeSlug($data['subdomain'] ?? '');
+            if (!empty($subdomain)) {
+                unset($_SESSION['chatmodel_chat_authenticated_' . $subdomain]);
+                unset($_SESSION['chatmodel_chat_time_' . $subdomain]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Logged out from chat session.']);
             exit;
         }
 
@@ -383,16 +437,14 @@ try {
             }
 
             $subdomain = strtolower(preg_replace('/[^a-zA-Z0-9-]/', '', trim($data['subdomain'] ?? '')));
-            $customDomain = strtolower(trim($data['custom_domain'] ?? ''));
             $businessName = trim($data['business_name'] ?? '');
             $webhookUrl = trim($data['webhook_url'] ?? '');
             $welcomeMessage = trim($data['welcome_message'] ?? 'Hello! How can we help your business today?');
             $themeColor = trim($data['theme_color'] ?? '#4f46e5');
             $plan = trim($data['plan'] ?? 'starter');
             $monthlyLimit = isset($data['monthly_limit']) ? (int)$data['monthly_limit'] : 2500;
-            $crmWebhookUrl = trim($data['crm_webhook_url'] ?? '');
-            $webhookSecret = trim($data['webhook_secret'] ?? '');
-            $crmEvents = trim($data['crm_events'] ?? 'lead_capture,escalation');
+            $chatAccessMode = trim($data['chat_access_mode'] ?? 'public');
+            $internalAccessKey = trim($data['internal_access_key'] ?? '');
             $isActive = isset($data['is_active']) ? (int)$data['is_active'] : 1;
 
             if (empty($subdomain) || empty($businessName) || empty($webhookUrl)) {
@@ -408,16 +460,13 @@ try {
                 exit;
             }
 
-            if (!empty($customDomain)) {
-                $dup = Database::getTenantByCustomDomain($customDomain);
-                if ($dup) {
-                    http_response_code(409);
-                    echo json_encode(['error' => "Custom domain '$customDomain' is already assigned to another tenant."]);
-                    exit;
-                }
+            if ($chatAccessMode === 'private' && empty($internalAccessKey)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'A Dedicated Internal Team Passcode / Key is mandatory when choosing Private mode.']);
+                exit;
             }
 
-            $created = Database::createTenant($subdomain, $businessName, $webhookUrl, $welcomeMessage, $themeColor, $plan, $monthlyLimit, $crmWebhookUrl, $webhookSecret, $crmEvents, $isActive, $customDomain);
+            $created = Database::createTenant($subdomain, $businessName, $webhookUrl, $welcomeMessage, $themeColor, $plan, $monthlyLimit, $isActive, '', $chatAccessMode, $internalAccessKey);
             if ($created) {
                 echo json_encode([
                     'success' => true,
@@ -453,7 +502,6 @@ try {
                 exit;
             }
 
-            $customDomain = strtolower(trim($data['custom_domain'] ?? ''));
             $businessName = trim($data['business_name'] ?? $existing['business_name']);
             $webhookUrl = trim($data['webhook_url'] ?? $existing['webhook_url']);
             $welcomeMessage = trim($data['welcome_message'] ?? $existing['welcome_message']);
@@ -464,141 +512,23 @@ try {
             $monthlyLimit = $isAdmin && isset($data['monthly_limit']) ? (int)$data['monthly_limit'] : (int)$existing['monthly_limit'];
             $isActive = $isAdmin && isset($data['is_active']) ? (int)$data['is_active'] : (int)$existing['is_active'];
 
-            $crmWebhookUrl = trim($data['crm_webhook_url'] ?? $existing['crm_webhook_url'] ?? '');
-            $webhookSecret = trim($data['webhook_secret'] ?? $existing['webhook_secret'] ?? '');
-            $crmEvents = trim($data['crm_events'] ?? $existing['crm_events'] ?? 'lead_capture,escalation');
+            $chatAccessMode = trim($data['chat_access_mode'] ?? $existing['chat_access_mode'] ?? 'public');
+            $internalAccessKey = isset($data['internal_access_key']) ? trim($data['internal_access_key']) : ($existing['internal_access_key'] ?? '');
 
-            if (!empty($customDomain)) {
-                $dup = Database::getTenantByCustomDomain($customDomain);
-                if ($dup && strtolower($dup['subdomain']) !== strtolower($subdomain)) {
-                    http_response_code(409);
-                    echo json_encode(['error' => "Custom domain '$customDomain' is already assigned to another tenant ({$dup['subdomain']})."]);
-                    exit;
-                }
+            // If user is non-admin and on starter plan, restrict access mode to public
+            if (!$isAdmin && strtolower($existing['plan'] ?? 'starter') === 'starter') {
+                $chatAccessMode = 'public';
+                $internalAccessKey = '';
             }
 
-            $updated = Database::updateTenant($subdomain, $businessName, $webhookUrl, $welcomeMessage, $themeColor, $plan, $monthlyLimit, $crmWebhookUrl, $webhookSecret, $crmEvents, $isActive, $customDomain);
-            echo json_encode(['success' => $updated, 'message' => 'Dedicated subdomain and custom domain settings updated successfully.']);
-            exit;
-        }
-
-        if ($action === 'verify_custom_domain') {
-            $customDomain = strtolower(trim($data['custom_domain'] ?? ''));
-            $subdomain = trim($data['subdomain'] ?? '');
-
-            if (empty($customDomain)) {
+            if ($chatAccessMode === 'private' && empty($internalAccessKey)) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Custom domain is required for DNS verification.']);
+                echo json_encode(['error' => 'A Dedicated Internal Team Passcode / Key is mandatory when choosing Private mode.']);
                 exit;
             }
 
-            // Perform DNS CNAME and A record inspection
-            $cnameRecords = @dns_get_record($customDomain, DNS_CNAME) ?: [];
-            $aRecords = @dns_get_record($customDomain, DNS_A) ?: [];
-
-            $cnameTarget = null;
-            $isCnameMatched = false;
-            foreach ($cnameRecords as $rec) {
-                if (isset($rec['target'])) {
-                    $cnameTarget = strtolower($rec['target']);
-                    if (str_contains($cnameTarget, 'chatmodel.in') || str_contains($cnameTarget, $subdomain)) {
-                        $isCnameMatched = true;
-                        break;
-                    }
-                }
-            }
-
-            $aTarget = null;
-            if (!empty($aRecords)) {
-                $aTarget = $aRecords[0]['ip'] ?? null;
-            }
-
-            echo json_encode([
-                'success' => true,
-                'domain' => $customDomain,
-                'cname_matched' => $isCnameMatched,
-                'detected_cname' => $cnameTarget,
-                'detected_ip' => $aTarget,
-                'required_cname' => "{$subdomain}.chatmodel.in",
-                'status' => $isCnameMatched ? 'Configured & Verified' : 'DNS Propagation Pending',
-                'instructions' => "Create a DNS CNAME record in your registrar (Cloudflare, GoDaddy, Namecheap) pointing '$customDomain' to '{$subdomain}.chatmodel.in' or 'chatmodel.in'."
-            ]);
-            exit;
-        }
-
-        if ($action === 'test_crm_pipeline') {
-            $crmUrl = trim($data['crm_webhook_url'] ?? '');
-            $secret = trim($data['webhook_secret'] ?? '');
-            $subdomain = Security::sanitizeSlug($data['subdomain'] ?? 'demo');
-
-            if (empty($crmUrl)) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Please provide a CRM Webhook URL to test.']);
-                exit;
-            }
-
-            // SSRF Check
-            $val = Security::validateExternalUrl($crmUrl);
-            if (!$val['valid']) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Security Error: ' . $val['error']]);
-                exit;
-            }
-
-            $testPayload = json_encode([
-                'event' => 'crm_pipeline_test',
-                'subdomain' => $subdomain,
-                'business_name' => 'ChatModel Verification Agent',
-                'session_id' => 'test_' . bin2hex(random_bytes(8)),
-                'customer_name' => 'Security Test Lead',
-                'customer_email' => 'lead.test@chatmodel.in',
-                'customer_phone' => '+91 9876543210',
-                'customer_message' => 'Interested in enterprise automated chat pipeline setup for our CRM.',
-                'timestamp' => date('Y-m-d H:i:s'),
-                'is_test' => true
-            ]);
-
-            $startTime = microtime(true);
-            $ch = curl_init($val['url']);
-            $headers = [
-                'Content-Type: application/json',
-                'X-ChatModel-Event: crm_pipeline_test',
-                'User-Agent: ChatModel-Pipeline-Tester/2.0'
-            ];
-            if (!empty($secret)) {
-                $headers[] = 'Authorization: Bearer ' . str_replace(["\r", "\n"], '', $secret);
-            }
-
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $testPayload);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 8);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false); // Prevent open-redirect SSRF
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
-            $latency = round((microtime(true) - $startTime) * 1000);
-            curl_close($ch);
-
-            if ($error) {
-                echo json_encode([
-                    'success' => false,
-                    'error' => "CRM Endpoint unreachable: $error",
-                    'latency_ms' => $latency
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => true,
-                    'http_code' => $httpCode,
-                    'latency_ms' => $latency,
-                    'message' => "CRM Webhook Pipeline responded with HTTP $httpCode in {$latency}ms.",
-                    'response_preview' => mb_substr($response, 0, 150)
-                ]);
-            }
+            $updated = Database::updateTenant($subdomain, $businessName, $webhookUrl, $welcomeMessage, $themeColor, $plan, $monthlyLimit, $isActive, $chatAccessMode, $internalAccessKey);
+            echo json_encode(['success' => $updated, 'message' => 'Dedicated subdomain settings updated successfully.']);
             exit;
         }
 

@@ -6,14 +6,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatModel - Enterprise Conversational Intelligence & 24/7 AI Assistants</title>
     <meta name="description"
-        content="Scale your business revenue and customer retention with proprietary 24/7 AI conversational assistants, custom branded client workspaces, and instant automated CRM actions.">
+        content="Scale your business revenue and customer retention with proprietary 24/7 AI conversational assistants, custom branded client workspaces, and instant automated actions.">
+    <meta name="keywords"
+        content="AI conversational assistant, enterprise chatbot, 24/7 customer support AI, lead qualification chatbot, automated customer support, n8n webhook AI, multi-tenant AI portal, business AI automation">
+    <meta name="author" content="ChatModel">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://chatmodel.in/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chatmodel.in/">
+    <meta property="og:title" content="ChatModel - Enterprise Conversational Intelligence & 24/7 AI Assistants">
+    <meta property="og:description"
+        content="Scale your business revenue and customer retention with proprietary 24/7 AI conversational assistants, custom branded client workspaces, and instant automated actions.">
+    <meta property="og:image" content="https://chatmodel.in/assets/img/og-preview.png">
+    <meta property="og:site_name" content="ChatModel">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://chatmodel.in/">
+    <meta name="twitter:title" content="ChatModel - Enterprise Conversational Intelligence & 24/7 AI Assistants">
+    <meta name="twitter:description"
+        content="Scale your business revenue and customer retention with proprietary 24/7 AI conversational assistants, custom branded client workspaces, and instant automated actions.">
+    <meta name="twitter:image" content="https://chatmodel.in/assets/img/og-preview.png">
+
+    <!-- Favicon & Brand Icons -->
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/img/favicon.svg">
+    <meta name="theme-color" content="#070913">
+
+    <!-- Google Fonts & Stylesheets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/landing.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
+    <!-- Schema.org JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "ChatModel",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "All",
+          "url": "https://chatmodel.in",
+          "description": "Enterprise Conversational Intelligence Platform with dedicated 24/7 AI assistants and automated client workspaces.",
+          "offers": [
+            {
+              "@type": "Offer",
+              "name": "Starter Plan",
+              "price": "1999",
+              "priceCurrency": "INR",
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock"
+            },
+            {
+              "@type": "Offer",
+              "name": "Professional Plan",
+              "price": "4999",
+              "priceCurrency": "INR",
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock"
+            },
+            {
+              "@type": "Offer",
+              "name": "Agency & Enterprise Plan",
+              "price": "9999",
+              "priceCurrency": "INR",
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock"
+            }
+          ]
+        },
+        {
+          "@type": "Organization",
+          "name": "ChatModel",
+          "url": "https://chatmodel.in",
+          "logo": "https://chatmodel.in/assets/img/favicon.svg",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "url": "https://chatmodel.in/#inquiry"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How quickly can I provision and launch my dedicated workspace?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Workspaces are provisioned in under 3 seconds with 0-downtime. Your dedicated subdomain (e.g. yourbrand.chatmodel.in) receives an automated SSL certificate and becomes instantly accessible worldwide."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the difference between Public and Private Chat Access modes?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Public Mode allows any website visitor to chat freely with your assistant without authentication. Private Mode locks the chat interface behind a dedicated internal passcode or workspace credentials for internal staff use."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I customize the branding, colors, and welcome greeting?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! Every dedicated workspace has full control over its brand title, hex theme accent color, custom welcome message, and light/dark theme settings."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What happens when my monthly conversation quota is reached?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can track your live conversation utilization in your dedicated Client Portal dashboard. When nearing your tier limit, you can upgrade your plan seamlessly with zero service interruption. Enterprise plans include unlimited conversations."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is our client conversation data private and secure?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Each workspace operates in an isolated tenant container. Subdomain portals and live chat sessions are protected with strict noindex robots directives and HTTP-level anti-scraping tags."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 
 <body>
@@ -33,6 +163,7 @@
                 <a href="#benefits" class="nav-link">Features</a>
                 <a href="#pricing" class="nav-link">Pricing</a>
                 <a href="#demo" class="nav-link">Live Demo</a>
+                <a href="#faq" class="nav-link">FAQs</a>
                 <a href="#inquiry" class="nav-link" style="color: var(--primary); font-weight: 600;">Contact /
                     Inquire</a>
             </div>
@@ -71,6 +202,7 @@
             <a href="#benefits" class="mobile-nav-link" onclick="closeMobileMenu()">✨ Features & Business Value</a>
             <a href="#pricing" class="mobile-nav-link" onclick="closeMobileMenu()">💎 Plans & Pricing</a>
             <a href="#demo" class="mobile-nav-link" onclick="closeMobileMenu()">⚡ Live Interactive Simulator</a>
+            <a href="#faq" class="mobile-nav-link" onclick="closeMobileMenu()">❓ Frequently Asked Questions</a>
             <a href="#inquiry" class="mobile-nav-link" onclick="closeMobileMenu()"
                 style="color: var(--primary); font-weight: 700;">📩 Contact & Inquire</a>
 
@@ -117,7 +249,7 @@
             <div class="section-header">
                 <div class="badge-pill">🌐 Dedicated Multi-Tenant Architecture</div>
                 <h2>Custom Dedicated Subdomains for Every Client</h2>
-                <p>Deliver exceptional brand authority with isolated custom URLs, whitelabel CNAME domains, and
+                <p>Deliver exceptional brand authority with isolated custom URLs, dedicated branded workspaces, and
                     automated SSL encryption.</p>
             </div>
 
@@ -133,19 +265,19 @@
                 </div>
 
                 <div class="domain-feature-card">
-                    <div style="font-size: 1.8rem; margin-bottom: 12px;">🛡️</div>
-                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Custom Domain CNAME
-                        Whitelabeling</h3>
+                    <div style="font-size: 1.8rem; margin-bottom: 12px;">🔗</div>
+                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Instant Webhook
+                        Routing</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
-                        Map your own domain (e.g. <code>chat.yourcompany.com</code> or
-                        <code>assistant.mybrand.in</code>) with automatic SSL certificate issuance.
+                        Each subdomain directly streams to your isolated webhook workflow, n8n, Make, or custom API
+                        with sub-millisecond dispatch.
                     </p>
                 </div>
 
                 <div class="domain-feature-card">
                     <div style="font-size: 1.8rem; margin-bottom: 12px;">🎨</div>
-                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Dedicated Branding &
-                        Theme Modes</h3>
+                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Whitelabel
+                        Customization</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
                         Every subdomain features independent brand accent styling, custom welcome concierges, and
                         persistent Day/Night mode toggles.
@@ -158,7 +290,7 @@
                         Lead Security</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
                         Each subdomain runs in an isolated multi-tenant container with dedicated session encryption,
-                        quota tracking, and CRM routing.
+                        quota tracking, and access controls.
                     </p>
                 </div>
             </div>
@@ -184,7 +316,7 @@
                     <div class="benefit-icon">🎯</div>
                     <h3>Automated Lead Qualification</h3>
                     <p>Screen budget, use-cases, and timelines automatically. Route high-intent prospects straight into
-                        your sales calendar and CRM pipelines.</p>
+                        your sales calendar and follow-up pipelines.</p>
                 </div>
 
                 <div class="benefit-card">
@@ -254,14 +386,14 @@
                                 stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            Day & Night Theme Customizer
+                            🌐 Public Chat Mode
                         </li>
                         <li>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            Lead Capture & Email Notifications
+                            Day & Night Theme Customizer
                         </li>
                         <li>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -272,14 +404,15 @@
                         </li>
                     </ul>
 
-                    <button type="button" onclick="selectPricingPlan('starter', 'Starter Plan')" class="btn-primary" style="justify-content: center; width: 100%; cursor: pointer;">Start 14-Day Free Trial</button>
+                    <button type="button" onclick="selectPricingPlan('starter', 'Starter Plan')" class="btn-primary"
+                        style="justify-content: center; width: 100%; cursor: pointer;">Start 14-Day Free Trial</button>
                 </div>
 
                 <!-- Professional Plan (Featured) -->
                 <div class="pricing-card featured">
                     <div class="pricing-badge">Most Popular</div>
                     <div class="plan-name">Professional</div>
-                    <div class="plan-desc">For growing companies requiring deep CRM sync, custom triggers, and
+                    <div class="plan-desc">For growing companies requiring private team assistants, custom triggers, and
                         multi-tenant isolation.</div>
                     <div class="plan-price">₹4,999 <span>/ month</span></div>
 
@@ -303,7 +436,14 @@
                                 stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            Advanced Webhook & CRM Pipelines
+                            Private & Public Chat Access Support
+                        </li>
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Passcode Authentication Control
                         </li>
                         <li>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -321,7 +461,8 @@
                         </li>
                     </ul>
 
-                    <button type="button" onclick="selectPricingPlan('professional', 'Professional Plan')" class="btn-primary"
+                    <button type="button" onclick="selectPricingPlan('professional', 'Professional Plan')"
+                        class="btn-primary"
                         style="justify-content: center; width: 100%; box-shadow: 0 10px 25px var(--primary-glow); cursor: pointer;">Get
                         Started Now</button>
                 </div>
@@ -353,7 +494,21 @@
                                 stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            Custom Domain CNAME / Dynamic SSL
+                            Dedicated AI Automation Webhook
+                        </li>
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Private & Public Chat Access Support
+                        </li>
+                        <li>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Dedicated Subdomain / Automated SSL
                         </li>
                         <li>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -371,7 +526,8 @@
                         </li>
                     </ul>
 
-                    <button type="button" onclick="selectPricingPlan('enterprise', 'Agency & Enterprise Plan')" class="btn-primary"
+                    <button type="button" onclick="selectPricingPlan('enterprise', 'Agency & Enterprise Plan')"
+                        class="btn-primary"
                         style="justify-content: center; width: 100%; background: var(--toggle-bg); border-color: var(--card-border); color: var(--text-heading); cursor: pointer;">Contact
                         Enterprise Sales</button>
                 </div>
@@ -387,17 +543,17 @@
                     Experience Instant Conversational AI in Real-Time
                 </h2>
                 <p style="font-size: 1rem; color: var(--text-body); margin-bottom: 24px; line-height: 1.6;">
-                    Test the AI assistant below. See how customer inquiries are understood instantly, formatted with
-                    rich responses, and connected to smart qualification flows.
+                    Test our intelligent sales & support concierge right here. Interact with it just as your prospective
+                    customers will on your dedicated client subdomain.
                 </p>
 
                 <div
-                    style="background: rgba(99, 102, 241, 0.05); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px;">
+                    style="background: var(--toggle-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); margin-bottom: 24px;">
                     <div style="font-size: 0.85rem; color: var(--text-heading); margin-bottom: 8px; font-weight: 600;">✨
                         Try asking questions like:</div>
                     <ul style="font-size: 0.85rem; color: var(--primary); margin-left: 20px; line-height: 1.7;">
                         <li>"How does 24/7 lead qualification work?"</li>
-                        <li>"Can the bot sync customer details to our CRM?"</li>
+                        <li>"Can the bot route conversations to our automation webhook?"</li>
                         <li>"What is the setup time for new client workspaces?"</li>
                     </ul>
                 </div>
@@ -440,6 +596,89 @@
                             ➤
                         </button>
                     </div>
+                    <div style="text-align: center; padding: 6px 10px; font-size: 0.7rem; color: var(--text-body); opacity: 0.8; background: var(--toggle-bg); border-top: 1px solid var(--card-border);">
+                        ⚠️ AI can make mistakes. Please verify important information.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FREQUENTLY ASKED QUESTIONS (FAQ) ACCORDION SECTION -->
+        <section id="faq" class="faq-section">
+            <div class="section-header">
+                <div class="badge-pill">❓ Got Questions?</div>
+                <h2>Frequently Asked Questions</h2>
+                <p>Everything you need to know about ChatModel's dedicated AI assistants, custom subdomains, and webhook
+                    automation.</p>
+            </div>
+
+            <div class="faq-container">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item active">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How quickly can I provision and launch my dedicated workspace?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Workspaces are provisioned in <strong>under 3 seconds</strong> with 0-downtime. Your
+                            dedicated subdomain (e.g., <code>yourbrand.chatmodel.in</code>) receives an automated SSL
+                            certificate and becomes instantly accessible worldwide without any manual DNS delays.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What is the difference between Public and Private Chat Access modes?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Public Mode</strong> allows any website visitor or client to chat freely with your
+                            assistant without authentication (ideal for customer service, marketing, and lead
+                            generation). <strong>Private Mode</strong> locks the chat interface behind a dedicated
+                            internal passcode or workspace credentials, making it perfect for company internal staff and
+                            confidential business tools.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I customize the branding, colors, and welcome greeting?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! Every dedicated workspace has full control over its brand title, hex theme accent color,
+                            custom welcome message, and light/dark theme settings. The chat interface automatically
+                            renders with your brand's unique color identity.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What happens when my monthly conversation quota is reached?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can track your live conversation utilization in your dedicated Client Portal dashboard.
+                            When nearing your tier limit, you can upgrade your plan seamlessly with zero service
+                            interruption. Enterprise plans include <strong>unlimited conversations</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Is our client conversation data private and secure?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes. Each workspace operates in an isolated tenant container. Subdomain portals and live chat
+                            sessions are protected with strict <code>noindex</code> robots directives and HTTP-level
+                            anti-scraping tags to ensure confidential company information is never leaked to search
+                            engines.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -453,7 +692,7 @@
                     Ready to Deploy Dedicated AI Assistants for Your Brand?
                 </h2>
                 <p style="font-size: 1rem; color: var(--text-body); margin-bottom: 24px; line-height: 1.6;">
-                    Have questions about custom CRM pipelines, high-volume conversational quotas, or whitelabeled
+                    Have questions about high-volume conversational quotas, custom access controls, or dedicated
                     subdomains? Send us your requirements and our engineering team will tailor a demonstration for your
                     business.
                 </p>
@@ -468,12 +707,12 @@
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span
                             style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: #10b981;">🔗</span>
-                        <span>Bi-directional Webhook & CRM Pipelines (HubSpot / Zoho / Custom)</span>
+                        <span>Bi-directional Webhook Integrations (n8n / Make / Custom APIs)</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span
                             style="width: 32px; height: 32px; border-radius: 8px; background: rgba(2, 132, 199, 0.15); display: flex; align-items: center; justify-content: center; color: #0284c7;">🛡️</span>
-                        <span>Custom Dedicated CNAME Domains & Whitelabel Portals</span>
+                        <span>Dedicated Custom Access Controls & Branded Subdomain Portals</span>
                     </div>
                 </div>
             </div>
@@ -523,7 +762,7 @@
                     <div class="inquiry-group">
                         <label>Your Requirements / Questions *</label>
                         <textarea id="inqMessage" class="inquiry-textarea"
-                            placeholder="Tell us about your use case, expected conversation volume, or CRM integrations..."
+                            placeholder="Tell us about your use case, expected conversation volume, or workflow integrations..."
                             required></textarea>
                     </div>
 
@@ -538,8 +777,14 @@
         <!-- Footer -->
         <footer>
             <div class="container">
-                <p>© <?php echo date('Y'); ?> ChatModel.in — Enterprise Conversational AI & Multi-Tenant Automation
-                    Platform. All Rights Reserved.</p>
+                <p>© <?php echo date('Y'); ?> ChatModel.in — Enterprise Conversational AI & Multi-Tenant Automation Platform. All Rights Reserved.</p>
+                <div style="margin-top: 10px; font-size: 0.84rem; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="/privacy.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Privacy Policy</a>
+                    <span style="color: var(--card-border);">•</span>
+                    <a href="/terms.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Terms & Conditions</a>
+                    <span style="color: var(--card-border);">•</span>
+                    <a href="/login.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Client Portal</a>
+                </div>
             </div>
         </footer>
     </div>

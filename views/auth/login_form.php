@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ChatModel Workspace</title>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
@@ -51,8 +53,32 @@
                     required autocomplete="current-password">
             </div>
 
+            <div style="display: flex; justify-content: flex-end; margin-top: -6px; margin-bottom: 14px;">
+                <a href="javascript:void(0)" onclick="openForgotHelpModal()"
+                    style="font-size: 0.78rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+                    Forgot Password?
+                </a>
+            </div>
+
             <button type="submit" class="btn-submit">Authenticate & Enter Portal</button>
         </form>
+
+        <!-- Forgot Password Help Modal -->
+        <div id="forgotHelpModal" class="modal-overlay">
+            <div class="modal-box" style="max-width: 440px; text-align: center;">
+                <div style="font-size: 2.2rem; margin-bottom: 10px;">🔐</div>
+                <div class="modal-title" style="margin-bottom: 8px;">Forgot Subdomain Password?</div>
+                <p style="color: var(--text-body); font-size: 0.86rem; line-height: 1.5; margin-bottom: 18px;">
+                    Workspace passwords for dedicated subdomains are managed and secured by your system administrator.
+                    Please contact your <strong>Super Admin</strong> to trigger a secure password reset from the Admin
+                    Console.
+                </p>
+                <button type="button" onclick="closeForgotHelpModal()" class="btn-submit"
+                    style="margin-top: 0; padding: 10px;">
+                    Got it, Close
+                </button>
+            </div>
+        </div>
 
         <div style="text-align: center; margin-top: 20px;">
             <a href="/"

@@ -1,0 +1,25 @@
+# ChatModel.in Robots.txt
+# Allow search indexing ONLY for the public marketing landing page
+
+User-agent: *
+# Allow public marketing page, legal pages & brand assets
+Allow: /$
+Allow: /privacy.php
+Allow: /terms.php
+Allow: /assets/css/
+Allow: /assets/js/
+Allow: /assets/img/
+Allow: /assets/img/favicon.svg
+
+# Block admin panel, customer workspaces, and internal API routes
+Disallow: /login.php
+Disallow: /admin
+Disallow: /api/
+Disallow: /views/
+Disallow: /data/
+Disallow: /db/
+Disallow: /deploy/
+Disallow: /*?subdomain=*
+
+# Host & Sitemap
+Sitemap: https://chatmodel.in/sitemap.xml

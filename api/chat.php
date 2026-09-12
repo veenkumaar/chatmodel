@@ -1,7 +1,7 @@
 <?php
 /**
  * Backend Multi-Tenant Chat Proxy
- * Verifies tenant status, quotas, routes to automation webhook, and executes CRM pipelines
+ * Verifies tenant status, quotas, and routes to automation webhook
  */
 
 header('Content-Type: application/json');
@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/../db/database.php';
 require_once __DIR__ . '/../db/security.php';
+
+Security::startSecureSession();
 
 // Rate Limiting: Max 40 messages per minute per IP to prevent DoS/flooding
 if (!Security::checkRateLimit('chat_proxy', 40, 60)) {
@@ -52,17 +54,12 @@ if (mb_strlen($message) > 3000) {
     exit;
 }
 
-// Fallback: Check Host header for Subdomain or Custom Whitelabel Domain
+// Fallback: Check Host header for Subdomain
 if (empty($subdomain)) {
     $host = $_SERVER['HTTP_HOST'] ?? '';
     $host = strtolower(explode(':', $host)[0]);
     if (preg_match('/^([a-z0-9-]+)\.chatmodel\.in$/i', $host, $matches)) {
         $subdomain = strtolower($matches[1]);
-    } else {
-        $customTenant = Database::getTenantByCustomDomain($host);
-        if ($customTenant) {
-            $subdomain = strtolower($customTenant['subdomain']);
-        }
     }
 }
 
@@ -75,8 +72,7 @@ if (empty($message)) {
 // 1. Determine Target Webhook & Tenant Status
 $webhookUrl = 'https://api.chatmodel.in/webhook/chat-default';
 $businessName = 'ChatModel Assistant';
-$crmWebhookUrl = '';
-$webhookSecret = '';
+$isInternalSession = false;
 
 if (!empty($subdomain) && $subdomain !== 'n8n' && $subdomain !== 'www') {
     $tenant = Database::getTenantBySubdomain($subdomain);
@@ -96,6 +92,32 @@ if (!empty($subdomain) && $subdomain !== 'n8n' && $subdomain !== 'www') {
         exit;
     }
 
+    // Check Chat Access Mode (Public, Private, Both)
+    $chatAccessMode = $tenant['chat_access_mode'] ?? 'public';
+    
+    // Check if session is authenticated on chat interface
+    $hasChatAuth = !empty($_SESSION['chatmodel_chat_authenticated_' . $subdomain]);
+    $authPasscode = trim((string)($payload['authPasscode'] ?? ''));
+
+    if (!empty($authPasscode) && Database::verifyChatAccess($subdomain, $authPasscode)) {
+        $_SESSION['chatmodel_chat_authenticated_' . $subdomain] = true;
+        $hasChatAuth = true;
+    }
+
+    $isInternalSession = $hasChatAuth;
+
+    // If Private Mode: strictly require authentication
+    if ($chatAccessMode === 'private' && !$isInternalSession) {
+        http_response_code(401);
+        echo json_encode([
+            'error' => 'Authentication required. This AI Assistant is configured for private / internal company use only. Please enter the access passcode to continue.',
+            'auth_required' => true,
+            'chat_access_mode' => 'private',
+            'business_name' => $tenant['business_name']
+        ]);
+        exit;
+    }
+
     // Check Monthly Conversation Quota
     $stats = Database::getTenantConversationStats($subdomain);
     if ($stats['is_over_quota']) {
@@ -108,44 +130,8 @@ if (!empty($subdomain) && $subdomain !== 'n8n' && $subdomain !== 'www') {
         exit;
     }
 
-    $crmWebhookUrl = $tenant['crm_webhook_url'] ?? '';
-    $webhookSecret = $tenant['webhook_secret'] ?? '';
-    $crmEvents = $tenant['crm_events'] ?? 'lead_capture,escalation';
     $webhookUrl = $tenant['webhook_url'];
     $businessName = $tenant['business_name'];
-}
-
-// Helper: Dispatch to Advanced CRM Pipeline with SSRF validation
-function dispatchCrmPipeline(string $crmUrl, string $secret, string $event, array $payload): void {
-    if (empty($crmUrl)) return;
-    
-    // SSRF Security Check
-    $val = Security::validateExternalUrl($crmUrl);
-    if (!$val['valid']) return;
-
-    try {
-        $ch = curl_init($crmUrl);
-        $headers = [
-            'Content-Type: application/json',
-            'X-ChatModel-Event: ' . preg_replace('/[^a-zA-Z0-9_-]/', '', $event),
-            'User-Agent: ChatModel-CRMPipeline/2.0'
-        ];
-        if (!empty($secret)) {
-            $headers[] = 'Authorization: Bearer ' . str_replace(["\r", "\n"], '', $secret);
-        }
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Non-blocking fast timeout
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false); // Prevent open redirect SSRF
-        curl_exec($ch);
-        curl_close($ch);
-    } catch (Exception $e) {
-        // Safe failover
-    }
 }
 
 // Log incoming user message
@@ -180,6 +166,8 @@ try {
         'businessName' => $businessName,
         'extractedEmail' => $extractedEmail,
         'extractedPhone' => $extractedPhone,
+        'is_internal_session' => $isInternalSession,
+        'chat_access_mode' => $chatAccessMode ?? 'public',
         'timestamp' => date('Y-m-d H:i:s')
     ]);
 
@@ -201,23 +189,8 @@ try {
 
     if ($error) {
         // Fallback simulated intelligent reply
-        $fallbackReply = "Thank you for reaching out to **$businessName**! Your message (*\"$message\"*) was received. Automated workflows and CRM triggers are running seamlessly.";
+        $fallbackReply = "Thank you for reaching out to **$businessName**! Your message (*\"$message\"*) was received. Automated workflows are running seamlessly.";
         Database::logMessage($subdomain ?: 'root', $sessionId, 'bot', $fallbackReply);
-
-        // Dispatch CRM Pipeline trigger if lead detected
-        if (!empty($crmWebhookUrl) && ($extractedEmail || $extractedPhone || preg_match('/(pricing|price|quote|demo|hire|consult|call|contact|book)/i', $message))) {
-            dispatchCrmPipeline($crmWebhookUrl, $webhookSecret, 'lead_capture', [
-                'event' => 'lead_capture',
-                'subdomain' => $subdomain,
-                'business_name' => $businessName,
-                'session_id' => $sessionId,
-                'customer_message' => $message,
-                'extracted_email' => $extractedEmail,
-                'extracted_phone' => $extractedPhone,
-                'bot_response' => $fallbackReply,
-                'timestamp' => date('Y-m-d H:i:s')
-            ]);
-        }
 
         echo json_encode([
             'response' => $fallbackReply,
@@ -238,21 +211,6 @@ try {
         $botText = !empty($response) ? $response : "Message processed by $businessName automation.";
         Database::logMessage($subdomain ?: 'root', $sessionId, 'bot', $botText);
         $decoded = ['response' => $botText];
-    }
-
-    // Dispatch to CRM Pipeline
-    if (!empty($crmWebhookUrl) && ($extractedEmail || $extractedPhone || preg_match('/(pricing|price|quote|demo|hire|consult|call|contact|book)/i', $message))) {
-        dispatchCrmPipeline($crmWebhookUrl, $webhookSecret, 'lead_capture', [
-            'event' => 'lead_capture',
-            'subdomain' => $subdomain,
-            'business_name' => $businessName,
-            'session_id' => $sessionId,
-            'customer_message' => $message,
-            'extracted_email' => $extractedEmail,
-            'extracted_phone' => $extractedPhone,
-            'bot_response' => is_string($botText) ? $botText : json_encode($botText),
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
     }
 
     echo json_encode($decoded);
