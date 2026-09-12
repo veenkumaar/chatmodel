@@ -164,3 +164,33 @@ async function handleInquirySubmit(e) {
         submitBtn.textContent = '🚀 Send Business Inquiry';
     }
 }
+
+// Plan Selection & Smooth Scroll with Notification
+function selectPricingPlan(planCode, planName) {
+    const planSelect = document.getElementById('inqPlan');
+    if (planSelect) {
+        planSelect.value = planCode;
+    }
+
+    const alertBox = document.getElementById('inquiryAlert');
+    if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(99, 102, 241, 0.15)';
+        alertBox.style.color = '#818cf8';
+        alertBox.style.border = '1px solid rgba(99, 102, 241, 0.35)';
+        alertBox.innerHTML = `✨ <strong>${planName} Selected!</strong> Please fill out this form — our team will contact you shortly to deploy your assistant.`;
+    }
+
+    const inquirySection = document.getElementById('inquiry');
+    if (inquirySection) {
+        inquirySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    setTimeout(() => {
+        const nameInput = document.getElementById('inqName');
+        if (nameInput) {
+            nameInput.focus();
+        }
+    }, 500);
+}
+

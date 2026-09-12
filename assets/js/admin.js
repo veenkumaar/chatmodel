@@ -522,3 +522,79 @@ async function deleteInquiry(id) {
         alert('Failed to delete inquiry');
     }
 }
+
+// Admin Password Management
+function openAdminPasswordModal() {
+    const modal = document.getElementById('adminPasswordModal');
+    const form = document.getElementById('adminPasswordForm');
+    const status = document.getElementById('adminPasswordStatus');
+    if (form) form.reset();
+    if (status) status.style.display = 'none';
+    if (modal) modal.classList.add('active');
+}
+
+function closeAdminPasswordModal() {
+    const modal = document.getElementById('adminPasswordModal');
+    if (modal) modal.classList.remove('active');
+}
+
+async function handleAdminPasswordChange(e) {
+    e.preventDefault();
+    const currentPassword = document.getElementById('adminCurrentPassword').value.trim();
+    const newPassword = document.getElementById('adminNewPassword').value.trim();
+    const confirmPassword = document.getElementById('adminConfirmPassword').value.trim();
+    const statusDiv = document.getElementById('adminPasswordStatus');
+
+    if (newPassword.length < 6) {
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusDiv.style.color = '#ef4444';
+        statusDiv.textContent = '❌ New password must be at least 6 characters long.';
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusDiv.style.color = '#ef4444';
+        statusDiv.textContent = '❌ New passwords do not match. Please re-type.';
+        return;
+    }
+
+    statusDiv.style.display = 'block';
+    statusDiv.style.background = 'rgba(99, 102, 241, 0.1)';
+    statusDiv.style.color = '#818cf8';
+    statusDiv.textContent = '⏳ Updating password...';
+
+    try {
+        const res = await fetch('/api/tenants.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'update_admin_password',
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            statusDiv.style.background = 'rgba(16, 185, 129, 0.15)';
+            statusDiv.style.color = '#10b981';
+            statusDiv.textContent = '✅ ' + (data.message || 'Password changed successfully!');
+            showToast('Admin password updated successfully!');
+            setTimeout(() => {
+                closeAdminPasswordModal();
+            }, 1200);
+        } else {
+            statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+            statusDiv.style.color = '#ef4444';
+            statusDiv.textContent = '❌ ' + (data.error || 'Failed to update password.');
+        }
+    } catch (err) {
+        statusDiv.style.background = 'rgba(239, 68, 68, 0.15)';
+        statusDiv.style.color = '#ef4444';
+        statusDiv.textContent = '❌ Server communication error.';
+    }
+}
+

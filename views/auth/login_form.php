@@ -24,7 +24,9 @@
             </button>
         </div>
 
-        <div class="logo-badge">⚡</div>
+        <a href="/" style="text-decoration: none;" title="Back to ChatModel Home">
+            <div class="logo-badge">⚡</div>
+        </a>
         <h1>Workspace & Admin Login</h1>
         <p class="subtitle">Access your dedicated assistant workspace or admin console</p>
 
@@ -39,18 +41,26 @@
             <input type="hidden" name="csrf_token" value="<?php echo Security::getCsrfToken(); ?>">
             <div class="form-group">
                 <label for="username">Username or Subdomain Slug</label>
-                <input type="text" id="username" name="username" class="form-control"
-                    placeholder="e.g. aditya, demo, or admin" required autocomplete="username">
+                <input type="text" id="username" name="username" class="form-control" placeholder="e.g. username"
+                    required autocomplete="username">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••"
+                <input type="password" id="password" name="password" class="form-control" placeholder="password"
                     required autocomplete="current-password">
             </div>
 
             <button type="submit" class="btn-submit">Authenticate & Enter Portal</button>
         </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/"
+                style="color: var(--text-body); text-decoration: none; font-size: 0.88rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s ease;"
+                onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">
+                <span>←</span> <span>Back to ChatModel Home</span>
+            </a>
+        </div>
     </div>
 
     <script src="/assets/js/auth.js"></script>

@@ -33,7 +33,8 @@
                 <a href="#benefits" class="nav-link">Features</a>
                 <a href="#pricing" class="nav-link">Pricing</a>
                 <a href="#demo" class="nav-link">Live Demo</a>
-                <a href="#inquiry" class="nav-link" style="color: var(--primary); font-weight: 600;">Contact / Inquire</a>
+                <a href="#inquiry" class="nav-link" style="color: var(--primary); font-weight: 600;">Contact /
+                    Inquire</a>
             </div>
 
             <!-- Nav Actions (Desktop + Mobile) -->
@@ -49,12 +50,14 @@
                 <?php endif; ?>
 
                 <!-- Theme Switcher Button -->
-                <button id="mainThemeBtn" class="theme-switch-btn" title="Toggle Day / Night Mode" aria-label="Toggle Day / Night Mode">
+                <button id="mainThemeBtn" class="theme-switch-btn" title="Toggle Day / Night Mode"
+                    aria-label="Toggle Day / Night Mode">
                     <span id="mainThemeIcon">☀️</span>
                 </button>
 
                 <!-- Mobile Hamburger Toggle Button -->
-                <button id="mobileMenuToggle" class="mobile-menu-btn" title="Open navigation menu" aria-label="Open menu" onclick="toggleMobileMenu()">
+                <button id="mobileMenuToggle" class="mobile-menu-btn" title="Open navigation menu"
+                    aria-label="Open menu" onclick="toggleMobileMenu()">
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
@@ -68,19 +71,23 @@
             <a href="#benefits" class="mobile-nav-link" onclick="closeMobileMenu()">✨ Features & Business Value</a>
             <a href="#pricing" class="mobile-nav-link" onclick="closeMobileMenu()">💎 Plans & Pricing</a>
             <a href="#demo" class="mobile-nav-link" onclick="closeMobileMenu()">⚡ Live Interactive Simulator</a>
-            <a href="#inquiry" class="mobile-nav-link" onclick="closeMobileMenu()" style="color: var(--primary); font-weight: 700;">📩 Contact & Inquire</a>
+            <a href="#inquiry" class="mobile-nav-link" onclick="closeMobileMenu()"
+                style="color: var(--primary); font-weight: 700;">📩 Contact & Inquire</a>
 
             <div class="mobile-nav-divider"></div>
 
             <?php if ($isAdmin): ?>
-                <a href="/login.php" class="btn-primary" style="width: 100%; justify-content: center;" onclick="closeMobileMenu()">
+                <a href="/login.php" class="btn-primary" style="width: 100%; justify-content: center;"
+                    onclick="closeMobileMenu()">
                     🛡️ Admin Console (<?php echo htmlspecialchars($adminUser ?? 'Admin'); ?>)
                 </a>
-                <a href="/login.php?logout=1" style="color: #ef4444; text-align: center; display: block; margin-top: 10px; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                <a href="/login.php?logout=1"
+                    style="color: #ef4444; text-align: center; display: block; margin-top: 10px; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
                     Log out
                 </a>
             <?php else: ?>
-                <a href="/login.php" class="btn-primary" style="width: 100%; justify-content: center;" onclick="closeMobileMenu()">
+                <a href="/login.php" class="btn-primary" style="width: 100%; justify-content: center;"
+                    onclick="closeMobileMenu()">
                     🔐 Client Portal Access
                 </a>
             <?php endif; ?>
@@ -97,7 +104,8 @@
                 workflows directly from intelligent chat concierges tailored to your brand.
             </p>
             <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                <a href="#demo" class="btn-primary" style="padding: 14px 28px; font-size: 1rem;">Try Live Interactive Demo</a>
+                <a href="#demo" class="btn-primary" style="padding: 14px 28px; font-size: 1rem;">Try Live Interactive
+                    Demo</a>
                 <a href="#pricing" class="btn-primary"
                     style="background: rgba(99,102,241,0.1); border-color: var(--card-border); color: var(--text-heading); padding: 14px 28px; font-size: 1rem;">View
                     Pricing Plans</a>
@@ -109,39 +117,48 @@
             <div class="section-header">
                 <div class="badge-pill">🌐 Dedicated Multi-Tenant Architecture</div>
                 <h2>Custom Dedicated Subdomains for Every Client</h2>
-                <p>Deliver exceptional brand authority with isolated custom URLs, whitelabel CNAME domains, and automated SSL encryption.</p>
+                <p>Deliver exceptional brand authority with isolated custom URLs, whitelabel CNAME domains, and
+                    automated SSL encryption.</p>
             </div>
 
             <div class="domain-features-grid">
                 <div class="domain-feature-card">
                     <div style="font-size: 1.8rem; margin-bottom: 12px;">⚡</div>
-                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Instant 0-Downtime Provisioning</h3>
+                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Instant 0-Downtime
+                        Provisioning</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
-                        Launch your dedicated workspace in seconds at <code>yourbrand.chatmodel.in</code>. Zero DNS propagation delay and ready to converse instantly.
+                        Launch your dedicated workspace in seconds at <code>yourbrand.chatmodel.in</code>. Zero DNS
+                        propagation delay and ready to converse instantly.
                     </p>
                 </div>
 
                 <div class="domain-feature-card">
                     <div style="font-size: 1.8rem; margin-bottom: 12px;">🛡️</div>
-                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Custom Domain CNAME Whitelabeling</h3>
+                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Custom Domain CNAME
+                        Whitelabeling</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
-                        Map your own domain (e.g. <code>chat.yourcompany.com</code> or <code>assistant.mybrand.in</code>) with automatic SSL certificate issuance.
+                        Map your own domain (e.g. <code>chat.yourcompany.com</code> or
+                        <code>assistant.mybrand.in</code>) with automatic SSL certificate issuance.
                     </p>
                 </div>
 
                 <div class="domain-feature-card">
                     <div style="font-size: 1.8rem; margin-bottom: 12px;">🎨</div>
-                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Dedicated Branding & Theme Modes</h3>
+                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Dedicated Branding &
+                        Theme Modes</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
-                        Every subdomain features independent brand accent styling, custom welcome concierges, and persistent Day/Night mode toggles.
+                        Every subdomain features independent brand accent styling, custom welcome concierges, and
+                        persistent Day/Night mode toggles.
                     </p>
                 </div>
 
                 <div class="domain-feature-card">
                     <div style="font-size: 1.8rem; margin-bottom: 12px;">🔒</div>
-                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Isolated Quotas & Lead Security</h3>
+                    <h3 style="color: var(--text-heading); font-size: 1.15rem; margin-bottom: 8px;">Isolated Quotas &
+                        Lead Security</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-body);">
-                        Each subdomain runs in an isolated multi-tenant container with dedicated session encryption, quota tracking, and CRM routing.
+                        Each subdomain runs in an isolated multi-tenant container with dedicated session encryption,
+                        quota tracking, and CRM routing.
                     </p>
                 </div>
             </div>
@@ -255,8 +272,7 @@
                         </li>
                     </ul>
 
-                    <a href="#demo" class="btn-primary" style="justify-content: center; width: 100%;">Start 14-Day Free
-                        Trial</a>
+                    <button type="button" onclick="selectPricingPlan('starter', 'Starter Plan')" class="btn-primary" style="justify-content: center; width: 100%; cursor: pointer;">Start 14-Day Free Trial</button>
                 </div>
 
                 <!-- Professional Plan (Featured) -->
@@ -305,9 +321,9 @@
                         </li>
                     </ul>
 
-                    <a href="#demo" class="btn-primary"
-                        style="justify-content: center; width: 100%; box-shadow: 0 10px 25px var(--primary-glow);">Get
-                        Started Now</a>
+                    <button type="button" onclick="selectPricingPlan('professional', 'Professional Plan')" class="btn-primary"
+                        style="justify-content: center; width: 100%; box-shadow: 0 10px 25px var(--primary-glow); cursor: pointer;">Get
+                        Started Now</button>
                 </div>
 
                 <!-- Enterprise / Agency Plan -->
@@ -355,9 +371,9 @@
                         </li>
                     </ul>
 
-                    <a href="#demo" class="btn-primary"
-                        style="justify-content: center; width: 100%; background: var(--toggle-bg); border-color: var(--card-border); color: var(--text-heading);">Contact
-                        Enterprise Sales</a>
+                    <button type="button" onclick="selectPricingPlan('enterprise', 'Agency & Enterprise Plan')" class="btn-primary"
+                        style="justify-content: center; width: 100%; background: var(--toggle-bg); border-color: var(--card-border); color: var(--text-heading); cursor: pointer;">Contact
+                        Enterprise Sales</button>
                 </div>
             </div>
         </section>
@@ -432,24 +448,31 @@
         <section id="inquiry" class="inquiry-section-wrapper">
             <div>
                 <div class="badge-pill">📩 Partner With Us</div>
-                <h2 style="color: var(--text-heading); font-size: 2.2rem; font-weight: 700; margin-bottom: 16px; line-height: 1.2;">
+                <h2
+                    style="color: var(--text-heading); font-size: 2.2rem; font-weight: 700; margin-bottom: 16px; line-height: 1.2;">
                     Ready to Deploy Dedicated AI Assistants for Your Brand?
                 </h2>
                 <p style="font-size: 1rem; color: var(--text-body); margin-bottom: 24px; line-height: 1.6;">
-                    Have questions about custom CRM pipelines, high-volume conversational quotas, or whitelabeled subdomains? Send us your requirements and our engineering team will tailor a demonstration for your business.
+                    Have questions about custom CRM pipelines, high-volume conversational quotas, or whitelabeled
+                    subdomains? Send us your requirements and our engineering team will tailor a demonstration for your
+                    business.
                 </p>
 
-                <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem; color: var(--text-heading);">
+                <div
+                    style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem; color: var(--text-heading);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="width: 32px; height: 32px; border-radius: 8px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary);">⚡</span>
+                        <span
+                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary);">⚡</span>
                         <span>0-Downtime Provisioning with automated SSL certificates</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: #10b981;">🔗</span>
+                        <span
+                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: #10b981;">🔗</span>
                         <span>Bi-directional Webhook & CRM Pipelines (HubSpot / Zoho / Custom)</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="width: 32px; height: 32px; border-radius: 8px; background: rgba(2, 132, 199, 0.15); display: flex; align-items: center; justify-content: center; color: #0284c7;">🛡️</span>
+                        <span
+                            style="width: 32px; height: 32px; border-radius: 8px; background: rgba(2, 132, 199, 0.15); display: flex; align-items: center; justify-content: center; color: #0284c7;">🛡️</span>
                         <span>Custom Dedicated CNAME Domains & Whitelabel Portals</span>
                     </div>
                 </div>
@@ -457,24 +480,29 @@
 
             <!-- Inquiry Form Card -->
             <div class="inquiry-form-card">
-                <div id="inquiryAlert" style="display: none; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-bottom: 16px; font-weight: 600;"></div>
+                <div id="inquiryAlert"
+                    style="display: none; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-bottom: 16px; font-weight: 600;">
+                </div>
 
                 <form id="publicInquiryForm" onsubmit="handleInquirySubmit(event)">
                     <div class="inquiry-grid-2">
                         <div class="inquiry-group" style="margin-bottom: 0;">
                             <label>Your Name *</label>
-                            <input type="text" id="inqName" class="inquiry-input" placeholder="Praveen Kumar" required autocomplete="name">
+                            <input type="text" id="inqName" class="inquiry-input" placeholder="Name" required
+                                autocomplete="name">
                         </div>
                         <div class="inquiry-group" style="margin-bottom: 0;">
                             <label>Email Address *</label>
-                            <input type="email" id="inqEmail" class="inquiry-input" placeholder="praveen@company.com" required autocomplete="email">
+                            <input type="email" id="inqEmail" class="inquiry-input" placeholder="example@company.com"
+                                required autocomplete="email">
                         </div>
                     </div>
 
                     <div class="inquiry-grid-2">
                         <div class="inquiry-group" style="margin-bottom: 0;">
                             <label>Phone / WhatsApp Number</label>
-                            <input type="tel" id="inqPhone" class="inquiry-input" placeholder="+91 9876543210" autocomplete="tel">
+                            <input type="tel" id="inqPhone" class="inquiry-input" placeholder="+91 9876543210"
+                                autocomplete="tel">
                         </div>
                         <div class="inquiry-group" style="margin-bottom: 0;">
                             <label>Company / Brand Name</label>
@@ -494,10 +522,13 @@
 
                     <div class="inquiry-group">
                         <label>Your Requirements / Questions *</label>
-                        <textarea id="inqMessage" class="inquiry-textarea" placeholder="Tell us about your use case, expected conversation volume, or CRM integrations..." required></textarea>
+                        <textarea id="inqMessage" class="inquiry-textarea"
+                            placeholder="Tell us about your use case, expected conversation volume, or CRM integrations..."
+                            required></textarea>
                     </div>
 
-                    <button type="submit" id="inqSubmitBtn" class="btn-primary" style="width: 100%; justify-content: center; height: 46px; font-size: 0.95rem;">
+                    <button type="submit" id="inqSubmitBtn" class="btn-primary"
+                        style="width: 100%; justify-content: center; height: 46px; font-size: 0.95rem;">
                         🚀 Send Business Inquiry
                     </button>
                 </form>
@@ -507,11 +538,13 @@
         <!-- Footer -->
         <footer>
             <div class="container">
-                <p>© <?php echo date('Y'); ?> ChatModel.in — Enterprise Conversational AI & Multi-Tenant Automation Platform. All Rights Reserved.</p>
+                <p>© <?php echo date('Y'); ?> ChatModel.in — Enterprise Conversational AI & Multi-Tenant Automation
+                    Platform. All Rights Reserved.</p>
             </div>
         </footer>
     </div>
 
     <script src="/assets/js/landing.js"></script>
 </body>
+
 </html>

@@ -280,7 +280,45 @@ try {
             exit;
         }
 
-        // Action: Update password
+        // Action: Update Admin's Own Password
+        if ($action === 'update_admin_password') {
+            if (!$isAdmin) {
+                http_response_code(403);
+                echo json_encode(['error' => 'Admin authorization required.']);
+                exit;
+            }
+
+            $currentPassword = trim($data['current_password'] ?? '');
+            $newPassword = trim($data['new_password'] ?? '');
+            $adminUser = $_SESSION['chatmodel_admin_user'] ?? 'admin';
+
+            if (empty($newPassword)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'New password is required.']);
+                exit;
+            }
+
+            if (strlen($newPassword) < 6) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Password must be at least 6 characters long.']);
+                exit;
+            }
+
+            if (!empty($currentPassword) && !Database::verifyAdmin($adminUser, $currentPassword)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Current password is incorrect.']);
+                exit;
+            }
+
+            $updated = Database::updateAdminPassword($adminUser, $newPassword);
+            echo json_encode([
+                'success' => $updated,
+                'message' => 'Admin password updated successfully!'
+            ]);
+            exit;
+        }
+
+        // Action: Update password (for tenants)
         if ($action === 'update_password') {
             $subdomain = trim($data['subdomain'] ?? '');
             $newPassword = trim($data['new_password'] ?? '');

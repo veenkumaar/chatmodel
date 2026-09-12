@@ -103,6 +103,35 @@
         </div>
     </div>
 
+    <!-- Change Admin Password Modal -->
+    <div id="adminPasswordModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title">🔑 Change Admin Password</div>
+                <button class="modal-close" onclick="closeAdminPasswordModal()">✕</button>
+            </div>
+            <form id="adminPasswordForm" onsubmit="handleAdminPasswordChange(event)">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="adminCurrentPassword" class="form-control" placeholder="Enter current password" required autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label>New Password (min 6 characters)</label>
+                    <input type="password" id="adminNewPassword" class="form-control" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="adminConfirmPassword" class="form-control" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+                </div>
+                <div id="adminPasswordStatus" style="font-size: 0.78rem; display: none; line-height: 1.4; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 18px;">
+                    <button type="button" onclick="closeAdminPasswordModal()" style="flex: 1; background: var(--toggle-bg); color: var(--text-heading); border: 1px solid var(--input-border); padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-submit" style="flex: 1; margin-top: 0;">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Delete Tenant Modal -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-box" style="max-width: 440px; text-align: center;">
@@ -127,8 +156,11 @@
                     Global Admin & Subdomain Control</h2>
                 <div style="font-size: 0.85rem; color: var(--text-body);">Manage all tenant webhook pipelines, CRM sync, conversation quotas, and service states.</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="admin-tag">🛡️ <?php echo htmlspecialchars($adminUser); ?> (Global Admin)</span>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span class="admin-tag">🛡️ <?php echo htmlspecialchars($adminUser); ?></span>
+                <button type="button" onclick="openAdminPasswordModal()" class="btn-logs" style="padding: 5px 10px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px;">
+                    🔑 Change Password
+                </button>
                 <button id="adminThemeBtn" class="theme-switch-btn" title="Toggle Day / Night Mode">
                     <span id="adminThemeIcon">☀️</span>
                 </button>

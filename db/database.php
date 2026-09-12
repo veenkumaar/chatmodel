@@ -161,6 +161,16 @@ class Database {
         ]);
     }
 
+    public static function updateAdminPassword(string $username, string $newPassword): bool {
+        $db = self::getConnection();
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $db->prepare("UPDATE admins SET password_hash = :hash WHERE username = :username");
+        return $stmt->execute([
+            ':hash' => $hash,
+            ':username' => trim($username)
+        ]);
+    }
+
     public static function verifyAdmin(string $username, string $password): bool {
         $db = self::getConnection();
         $stmt = $db->prepare("SELECT * FROM admins WHERE username = :username LIMIT 1");
