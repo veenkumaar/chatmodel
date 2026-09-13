@@ -70,7 +70,7 @@ if (empty($message)) {
 }
 
 // 1. Determine Target Webhook & Tenant Status
-$webhookUrl = 'https://api.chatmodel.in/webhook/chat-default';
+$webhookUrl = 'https://api.chatmodel.in/webhook/chatmodel';
 $businessName = 'ChatModel Assistant';
 $isInternalSession = false;
 

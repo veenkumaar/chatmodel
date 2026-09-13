@@ -2,6 +2,15 @@
 <html lang="en" data-theme="dark">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RH4ZFSCEVS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-RH4ZFSCEVS');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatModel - Enterprise Conversational Intelligence & 24/7 AI Assistants</title>
@@ -163,7 +172,7 @@
                 <a href="#benefits" class="nav-link">Features</a>
                 <a href="#pricing" class="nav-link">Pricing</a>
                 <a href="#demo" class="nav-link">Live Demo</a>
-                <a href="#faq" class="nav-link">FAQs</a>
+                <a href="/faq.php" class="nav-link">FAQs</a>
                 <a href="#inquiry" class="nav-link" style="color: var(--primary); font-weight: 600;">Contact /
                     Inquire</a>
             </div>
@@ -202,7 +211,7 @@
             <a href="#benefits" class="mobile-nav-link" onclick="closeMobileMenu()">✨ Features & Business Value</a>
             <a href="#pricing" class="mobile-nav-link" onclick="closeMobileMenu()">💎 Plans & Pricing</a>
             <a href="#demo" class="mobile-nav-link" onclick="closeMobileMenu()">⚡ Live Interactive Simulator</a>
-            <a href="#faq" class="mobile-nav-link" onclick="closeMobileMenu()">❓ Frequently Asked Questions</a>
+            <a href="/faq.php" class="mobile-nav-link" onclick="closeMobileMenu()">❓ Frequently Asked Questions</a>
             <a href="#inquiry" class="mobile-nav-link" onclick="closeMobileMenu()"
                 style="color: var(--primary); font-weight: 700;">📩 Contact & Inquire</a>
 
@@ -603,85 +612,6 @@
             </div>
         </section>
 
-        <!-- FREQUENTLY ASKED QUESTIONS (FAQ) ACCORDION SECTION -->
-        <section id="faq" class="faq-section">
-            <div class="section-header">
-                <div class="badge-pill">❓ Got Questions?</div>
-                <h2>Frequently Asked Questions</h2>
-                <p>Everything you need to know about ChatModel's dedicated AI assistants, custom subdomains, and webhook
-                    automation.</p>
-            </div>
-
-            <div class="faq-container">
-                <!-- FAQ Item 1 -->
-                <div class="faq-item active">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>How quickly can I provision and launch my dedicated workspace?</span>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Workspaces are provisioned in <strong>under 3 seconds</strong> with 0-downtime. Your
-                            dedicated subdomain (e.g., <code>yourbrand.chatmodel.in</code>) receives an automated SSL
-                            certificate and becomes instantly accessible worldwide without any manual DNS delays.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 2 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>What is the difference between Public and Private Chat Access modes?</span>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p><strong>Public Mode</strong> allows any website visitor or client to chat freely with your
-                            assistant without authentication (ideal for customer service, marketing, and lead
-                            generation). <strong>Private Mode</strong> locks the chat interface behind a dedicated
-                            internal passcode or workspace credentials, making it perfect for company internal staff and
-                            confidential business tools.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 4 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Can I customize the branding, colors, and welcome greeting?</span>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes! Every dedicated workspace has full control over its brand title, hex theme accent color,
-                            custom welcome message, and light/dark theme settings. The chat interface automatically
-                            renders with your brand's unique color identity.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 5 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>What happens when my monthly conversation quota is reached?</span>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can track your live conversation utilization in your dedicated Client Portal dashboard.
-                            When nearing your tier limit, you can upgrade your plan seamlessly with zero service
-                            interruption. Enterprise plans include <strong>unlimited conversations</strong>.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 6 -->
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Is our client conversation data private and secure?</span>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes. Each workspace operates in an isolated tenant container. Subdomain portals and live chat
-                            sessions are protected with strict <code>noindex</code> robots directives and HTTP-level
-                            anti-scraping tags to ensure confidential company information is never leaked to search
-                            engines.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Enterprise Inquiry & Consultation Section -->
         <section id="inquiry" class="inquiry-section-wrapper">
@@ -779,6 +709,8 @@
             <div class="container">
                 <p>© <?php echo date('Y'); ?> ChatModel.in — Enterprise Conversational AI & Multi-Tenant Automation Platform. All Rights Reserved.</p>
                 <div style="margin-top: 10px; font-size: 0.84rem; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="/faq.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">FAQ</a>
+                    <span style="color: var(--card-border);">•</span>
                     <a href="/privacy.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Privacy Policy</a>
                     <span style="color: var(--card-border);">•</span>
                     <a href="/terms.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Terms & Conditions</a>

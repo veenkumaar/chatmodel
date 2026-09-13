@@ -4,11 +4,13 @@
  */
 require_once __DIR__ . '/security.php';
 
-class Database {
+class Database
+{
     private static ?PDO $pdo = null;
     private static string $dbFile = __DIR__ . '/../data/tenants.db';
 
-    public static function getConnection(): PDO {
+    public static function getConnection(): PDO
+    {
         if (self::$pdo === null) {
             $dataDir = dirname(self::$dbFile);
             if (!is_dir($dataDir)) {
@@ -30,7 +32,8 @@ class Database {
         return self::$pdo;
     }
 
-    private static function initSchema(): void {
+    private static function initSchema(): void
+    {
         $db = self::$pdo;
         $db->exec("
             CREATE TABLE IF NOT EXISTS admins (
@@ -95,7 +98,7 @@ class Database {
             self::createTenant(
                 'demo',
                 'ChatModel Demo Store',
-                'https://api.chatmodel.in/webhook/chat-demo',
+                'https://api.chatmodel.in/webhook/chatmodel',
                 'Hi! Welcome to ChatModel Demo Store. How may I assist your business today?',
                 '#6366f1',
                 'starter',
@@ -108,9 +111,9 @@ class Database {
             // 2. Professional Plan Tenant (Configurable Public/Private)
             self::createTenant(
                 'aditya',
-                'Aditya Logistics Automation',
-                'https://api.chatmodel.in/webhook/chat-aditya',
-                'Welcome to Aditya AI Assistant! Ask me anything about our automated enterprise delivery & tracking services.',
+                'Aditya Photography',
+                'https://api.chatmodel.in/webhook/adityaansul',
+                'Welcome to Aditya Photography! Ask me anything about our photography packages, bookings, and portfolios.',
                 '#0284c7',
                 'professional',
                 15000,
@@ -151,7 +154,8 @@ class Database {
         }
     }
 
-    public static function createAdmin(string $username, string $password): bool {
+    public static function createAdmin(string $username, string $password): bool
+    {
         $db = self::getConnection();
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $db->prepare("INSERT OR REPLACE INTO admins (username, password_hash) VALUES (:username, :password_hash)");
@@ -161,7 +165,8 @@ class Database {
         ]);
     }
 
-    public static function updateAdminPassword(string $username, string $newPassword): bool {
+    public static function updateAdminPassword(string $username, string $newPassword): bool
+    {
         $db = self::getConnection();
         $hash = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $db->prepare("UPDATE admins SET password_hash = :hash WHERE username = :username");
@@ -171,7 +176,8 @@ class Database {
         ]);
     }
 
-    public static function verifyAdmin(string $username, string $password): bool {
+    public static function verifyAdmin(string $username, string $password): bool
+    {
         $db = self::getConnection();
         $stmt = $db->prepare("SELECT * FROM admins WHERE username = :username LIMIT 1");
         $stmt->execute([':username' => trim($username)]);
@@ -182,7 +188,8 @@ class Database {
         return false;
     }
 
-    public static function verifyTenantUser(string $login, string $password): ?array {
+    public static function verifyTenantUser(string $login, string $password): ?array
+    {
         $login = strtolower(trim($login));
         $db = self::getConnection();
         $stmt = $db->prepare("SELECT * FROM tenants WHERE LOWER(subdomain) = :sub LIMIT 1");
@@ -204,7 +211,8 @@ class Database {
         return null;
     }
 
-    public static function updateTenantPassword(string $subdomain, string $newPassword): bool {
+    public static function updateTenantPassword(string $subdomain, string $newPassword): bool
+    {
         $db = self::getConnection();
         $hash = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $db->prepare("UPDATE tenants SET password_hash = :hash, updated_at = CURRENT_TIMESTAMP WHERE LOWER(subdomain) = :sub");
@@ -214,13 +222,15 @@ class Database {
         ]);
     }
 
-    public static function getAllTenants(): array {
+    public static function getAllTenants(): array
+    {
         $db = self::getConnection();
         $stmt = $db->query("SELECT * FROM tenants ORDER BY created_at DESC");
         return $stmt->fetchAll();
     }
 
-    public static function getTenantConversationStats(string $subdomain): array {
+    public static function getTenantConversationStats(string $subdomain): array
+    {
         $db = self::getConnection();
         $subdomain = strtolower(trim($subdomain));
 
@@ -242,12 +252,12 @@ class Database {
 
         $tenant = self::getTenantBySubdomain($subdomain);
         $plan = $tenant['plan'] ?? 'starter';
-        $monthlyLimit = isset($tenant['monthly_limit']) ? (int)$tenant['monthly_limit'] : 2500;
+        $monthlyLimit = isset($tenant['monthly_limit']) ? (int) $tenant['monthly_limit'] : 2500;
         if ($plan === 'enterprise' || $monthlyLimit < 0) {
             $monthlyLimit = -1; // Unlimited
         }
 
-        $monthlyConvs = (int)$stats['monthly_conversations'];
+        $monthlyConvs = (int) $stats['monthly_conversations'];
         $usagePercent = ($monthlyLimit > 0) ? min(100, round(($monthlyConvs / $monthlyLimit) * 100, 1)) : 0;
         $isOverQuota = ($monthlyLimit > 0) && ($monthlyConvs >= $monthlyLimit);
 
@@ -255,15 +265,16 @@ class Database {
             'plan' => $plan,
             'monthly_limit' => $monthlyLimit,
             'monthly_conversations' => $monthlyConvs,
-            'monthly_messages' => (int)$stats['total_messages'],
-            'all_time_conversations' => (int)$allStats['all_time_conversations'],
-            'all_time_messages' => (int)$allStats['all_time_messages'],
+            'monthly_messages' => (int) $stats['total_messages'],
+            'all_time_conversations' => (int) $allStats['all_time_conversations'],
+            'all_time_messages' => (int) $allStats['all_time_messages'],
             'usage_percent' => $usagePercent,
             'is_over_quota' => $isOverQuota
         ];
     }
 
-    public static function getAllTenantsWithStats(): array {
+    public static function getAllTenantsWithStats(): array
+    {
         $tenants = self::getAllTenants();
         foreach ($tenants as &$tenant) {
             $stats = self::getTenantConversationStats($tenant['subdomain']);
@@ -272,7 +283,8 @@ class Database {
         return $tenants;
     }
 
-    public static function getTenantBySubdomain(string $subdomain): ?array {
+    public static function getTenantBySubdomain(string $subdomain): ?array
+    {
         $subdomain = strtolower(trim($subdomain));
         $db = self::getConnection();
         $stmt = $db->prepare("SELECT * FROM tenants WHERE LOWER(subdomain) = :subdomain LIMIT 1");
@@ -281,16 +293,17 @@ class Database {
         return $result ? $result : null;
     }
 
-    public static function isSubdomainAvailable(string $subdomain): array {
+    public static function isSubdomainAvailable(string $subdomain): array
+    {
         $subdomain = strtolower(preg_replace('/[^a-zA-Z0-9-]/', '', trim($subdomain)));
-        
+
         if (strlen($subdomain) < 3) {
             return ['available' => false, 'subdomain' => $subdomain, 'reason' => 'Subdomain must be at least 3 characters.'];
         }
         if (strlen($subdomain) > 63) {
             return ['available' => false, 'subdomain' => $subdomain, 'reason' => 'Subdomain cannot exceed 63 characters.'];
         }
-        
+
         $reserved = ['www', 'admin', 'api', 'login', 'n8n', 'app', 'mail', 'dashboard', 'status', 'auth', 'cname', 'root', 'static', 'assets', 'cdn', 'demo', 'chatmodel'];
         if (in_array($subdomain, $reserved)) {
             return ['available' => false, 'subdomain' => $subdomain, 'reason' => 'This is a reserved system subdomain and cannot be registered.'];
@@ -310,7 +323,8 @@ class Database {
         ];
     }
 
-    public static function getTenantChatHistory(string $subdomain, int $limit = 50): array {
+    public static function getTenantChatHistory(string $subdomain, int $limit = 50): array
+    {
         $db = self::getConnection();
         $stmt = $db->prepare("
             SELECT * FROM chat_logs 
@@ -324,18 +338,22 @@ class Database {
         return $stmt->fetchAll();
     }
 
-    public static function checkQuota(string $subdomain): bool {
+    public static function checkQuota(string $subdomain): bool
+    {
         $stats = self::getTenantConversationStats($subdomain);
         return !$stats['is_over_quota'];
     }
 
-    public static function verifyChatAccess(string $subdomain, string $passcodeOrPassword): bool {
+    public static function verifyChatAccess(string $subdomain, string $passcodeOrPassword): bool
+    {
         $subdomain = strtolower(trim($subdomain));
         $passcodeOrPassword = trim($passcodeOrPassword);
-        if (empty($passcodeOrPassword)) return false;
+        if (empty($passcodeOrPassword))
+            return false;
 
         $tenant = self::getTenantBySubdomain($subdomain);
-        if (!$tenant) return false;
+        if (!$tenant)
+            return false;
 
         // 1. Check dedicated internal access key if configured
         if (!empty($tenant['internal_access_key']) && hash_equals($tenant['internal_access_key'], $passcodeOrPassword)) {
@@ -370,11 +388,14 @@ class Database {
     ): bool {
         $db = self::getConnection();
         $subdomain = strtolower(preg_replace('/[^a-zA-Z0-9-]/', '', trim($subdomain)));
-        if (empty($subdomain)) return false;
+        if (empty($subdomain))
+            return false;
 
         // Auto-assign limit based on plan if standard
-        if ($plan === 'professional' && $monthlyLimit == 2500) $monthlyLimit = 15000;
-        if ($plan === 'enterprise') $monthlyLimit = -1;
+        if ($plan === 'professional' && $monthlyLimit == 2500)
+            $monthlyLimit = 15000;
+        if ($plan === 'enterprise')
+            $monthlyLimit = -1;
 
         $validModes = ['public', 'private'];
         if (!in_array($chatAccessMode, $validModes)) {
@@ -399,7 +420,8 @@ class Database {
         ]);
     }
 
-    public static function updateTenantStatus(string $subdomain, int $isActive): bool {
+    public static function updateTenantStatus(string $subdomain, int $isActive): bool
+    {
         $db = self::getConnection();
         $stmt = $db->prepare("UPDATE tenants SET is_active = :is_active, updated_at = CURRENT_TIMESTAMP WHERE subdomain = :subdomain");
         return $stmt->execute([
@@ -421,8 +443,10 @@ class Database {
         string $internalAccessKey = ''
     ): bool {
         $db = self::getConnection();
-        if ($plan === 'professional' && $monthlyLimit == 2500) $monthlyLimit = 15000;
-        if ($plan === 'enterprise') $monthlyLimit = -1;
+        if ($plan === 'professional' && $monthlyLimit == 2500)
+            $monthlyLimit = 15000;
+        if ($plan === 'enterprise')
+            $monthlyLimit = -1;
 
         $validModes = ['public', 'private'];
         if (!in_array($chatAccessMode, $validModes)) {
@@ -457,7 +481,8 @@ class Database {
         ]);
     }
 
-    public static function deleteTenant(string $subdomain): bool {
+    public static function deleteTenant(string $subdomain): bool
+    {
         $db = self::getConnection();
         $sub = strtolower(trim($subdomain));
         $stmt = $db->prepare("DELETE FROM tenants WHERE subdomain = :subdomain");
@@ -468,7 +493,8 @@ class Database {
         return true;
     }
 
-    public static function logMessage(string $subdomain, string $sessionId, string $sender, string $message): void {
+    public static function logMessage(string $subdomain, string $sessionId, string $sender, string $message): void
+    {
         try {
             $db = self::getConnection();
             $stmt = $db->prepare("
@@ -515,7 +541,8 @@ class Database {
         }
     }
 
-    public static function getAllInquiries(): array {
+    public static function getAllInquiries(): array
+    {
         try {
             $db = self::getConnection();
             $stmt = $db->query("SELECT * FROM inquiries ORDER BY created_at DESC");
@@ -525,18 +552,20 @@ class Database {
         }
     }
 
-    public static function getNewInquiriesCount(): int {
+    public static function getNewInquiriesCount(): int
+    {
         try {
             $db = self::getConnection();
             $stmt = $db->query("SELECT COUNT(*) as cnt FROM inquiries WHERE status = 'new'");
             $res = $stmt->fetch();
-            return (int)($res['cnt'] ?? 0);
+            return (int) ($res['cnt'] ?? 0);
         } catch (Exception $e) {
             return 0;
         }
     }
 
-    public static function updateInquiryStatus(int $id, string $status): bool {
+    public static function updateInquiryStatus(int $id, string $status): bool
+    {
         try {
             $db = self::getConnection();
             $stmt = $db->prepare("UPDATE inquiries SET status = :status WHERE id = :id");
@@ -549,7 +578,8 @@ class Database {
         }
     }
 
-    public static function deleteInquiry(int $id): bool {
+    public static function deleteInquiry(int $id): bool
+    {
         try {
             $db = self::getConnection();
             $stmt = $db->prepare("DELETE FROM inquiries WHERE id = :id");

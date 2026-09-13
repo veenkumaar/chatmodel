@@ -2,6 +2,15 @@
 <html lang="en" data-theme="dark">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RH4ZFSCEVS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-RH4ZFSCEVS');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms & Conditions - ChatModel.in</title>
@@ -188,9 +197,14 @@
         <footer>
             <div class="container">
                 <p>© <?php echo date('Y'); ?> ChatModel.in — Enterprise Conversational AI & Multi-Tenant Automation Platform. All Rights Reserved.</p>
-                <div style="margin-top: 10px; font-size: 0.84rem; display: flex; justify-content: center; gap: 20px;">
-                    <a href="/privacy.php" style="color: var(--text-body); text-decoration: none;">Privacy Policy</a>
+                <div style="margin-top: 10px; font-size: 0.84rem; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="/faq.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">FAQ</a>
+                    <span style="color: var(--card-border);">•</span>
+                    <a href="/privacy.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Privacy Policy</a>
+                    <span style="color: var(--card-border);">•</span>
                     <a href="/terms.php" style="color: var(--primary); text-decoration: none; font-weight: 600;">Terms & Conditions</a>
+                    <span style="color: var(--card-border);">•</span>
+                    <a href="/login.php" style="color: var(--text-body); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-body)'">Client Portal</a>
                 </div>
             </div>
         </footer>

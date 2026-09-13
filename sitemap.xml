@@ -10,6 +10,13 @@
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
+    <!-- Frequently Asked Questions -->
+    <url>
+        <loc>https://chatmodel.in/faq.php</loc>
+        <lastmod>2026-09-13T10:13:00+05:30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
     <!-- Privacy Policy -->
     <url>
         <loc>https://chatmodel.in/privacy.php</loc>
