@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://chatmodel.in/api/",
+      "service-desc": [
+        {
+          "href": "https://chatmodel.in/api/openapi.json",
+          "type": "application/openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://chatmodel.in/faq.php",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://chatmodel.in/api/health.php",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

@@ -2,10 +2,16 @@
 # Allow search indexing ONLY for the public marketing landing page
 
 User-agent: *
+Content-Signal: ai-train=no, search=yes, ai-input=yes
+
 # Allow public marketing page, legal pages & brand assets
 Allow: /$
+Allow: /faq.php
 Allow: /privacy.php
 Allow: /terms.php
+Allow: /llms.txt
+Allow: /auth.md
+Allow: /.well-known/
 Allow: /assets/css/
 Allow: /assets/js/
 Allow: /assets/img/
@@ -21,5 +27,6 @@ Disallow: /db/
 Disallow: /deploy/
 Disallow: /*?subdomain=*
 
-# Host & Sitemap
+# Host & Sitemap & Agentic Discovery
 Sitemap: https://chatmodel.in/sitemap.xml
+Agentmap: https://chatmodel.in/.well-known/ai-catalog.json

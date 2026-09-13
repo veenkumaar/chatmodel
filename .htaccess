@@ -2,8 +2,8 @@
 # ChatModel SaaS Platform - Production Server Configuration (.htaccess)
 # ==============================================================================
 
-# 1. Protect Sensitive Files & Directories
-<FilesMatch "\.(db|sqlite|sqlite3|sql|log|ini|env|sh|md|git|bak|backup)$">
+# 1. Protect Sensitive Files & Directories (Internal configurations, DBs, logs)
+<FilesMatch "(\.(db|sqlite|sqlite3|sql|log|ini|env|sh|git|bak|backup)$|^(README|PRODUCTION_SETUP)\.md$)">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
@@ -23,7 +23,26 @@ Options -Indexes
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     # Allow iframe embedding for assistant widget on client websites
     Header set Access-Control-Allow-Origin "*"
+    # RFC 8288 & RFC 9727 Agent Discovery Link Headers
+    Header set Link "</.well-known/api-catalog>; rel=\"api-catalog\", </api/openapi.json>; rel=\"service-desc\"; type=\"application/openapi+json\", </faq.php>; rel=\"service-doc\""
 </IfModule>
+
+# RFC 9727 API Catalog & Auth.md MIME Types
+<Files "api-catalog">
+    <IfModule mod_mime.c>
+        ForceType application/linkset+json
+    </IfModule>
+</Files>
+
+<Files "auth.md">
+    <IfModule mod_mime.c>
+        ForceType "text/markdown; charset=utf-8"
+    </IfModule>
+    <IfModule mod_headers.c>
+        Header set Content-Type "text/markdown; charset=utf-8"
+        Header set Access-Control-Allow-Origin "*"
+    </IfModule>
+</Files>
 
 # 4. Gzip / Deflate Compression for Speed
 <IfModule mod_deflate.c>
@@ -47,8 +66,8 @@ Options -Indexes
     RewriteEngine On
     RewriteBase /
 
-    # Block access to hidden dotfiles (.git, .env)
-    RewriteRule ^\.(.*)$ - [F,L]
+    # Block access to hidden dotfiles (.git, .env) except .well-known
+    RewriteRule ^\.(?!well-known)(.*)$ - [F,L]
 
     # Block direct access to data or db folders
     RewriteRule ^(data|db)(/.*)?$ - [F,L]

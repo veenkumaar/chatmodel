@@ -1,0 +1,28 @@
+{
+  "serverInfo": {
+    "name": "chatmodel-mcp-server",
+    "version": "1.0.0",
+    "description": "ChatModel Enterprise Conversational Intelligence Model Context Protocol Server"
+  },
+  "endpoint": "https://chatmodel.in/api/mcp.php",
+  "transport": {
+    "type": "http",
+    "endpoint": "https://chatmodel.in/api/mcp.php"
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "authentication": {
+    "type": "oauth2",
+    "authorization_server": "https://chatmodel.in"
+  }
+}

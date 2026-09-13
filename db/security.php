@@ -216,4 +216,27 @@ class Security {
     public static function sanitizeSlug(string $slug): string {
         return strtolower(preg_replace('/[^a-zA-Z0-9-]/', '', trim($slug)));
     }
+
+    /**
+     * Check if the incoming request requests Markdown representation (Accept: text/markdown)
+     */
+    public static function wantsMarkdown(): bool {
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        return stripos($accept, 'text/markdown') !== false;
+    }
+
+    /**
+     * Send Markdown response for agent content negotiation (RFC / Markdown for Agents)
+     */
+    public static function respondWithMarkdown(string $markdown): void {
+        $words = str_word_count($markdown);
+        $estimatedTokens = (int) ceil($words * 1.33);
+
+        header('Content-Type: text/markdown; charset=utf-8');
+        header('Vary: Accept');
+        header('x-markdown-tokens: ' . $estimatedTokens);
+        echo $markdown;
+        exit;
+    }
 }
+

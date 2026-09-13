@@ -30,7 +30,28 @@ To enable automatic dynamic subdomains (e.g. `aditya.chatmodel.in`, `demo.chatmo
 | **A** | `www` | `YOUR_SERVER_PUBLIC_IP` | Auto / 300 |
 | **A** | `*` *(Wildcard)* | `YOUR_SERVER_PUBLIC_IP` | Auto / 300 |
 
-> **Cloudflare Tip**: If using Cloudflare proxy (orange cloud), ensure you have an SSL certificate that covers `*.chatmodel.in` (Cloudflare Universal SSL covers wildcard subdomains automatically).
+### 🤖 DNS for AI Discovery (DNS-AID) Records (RFC 9460 / DNS-AID)
+
+To enable automated agent discovery via DNS:
+
+1. Add the following **SVCB / HTTPS** discovery records in your DNS management panel:
+
+| Type | Name / Host | Priority | Target | Value / Parameters |
+| :--- | :--- | :--- | :--- | :--- |
+| **SVCB** (or **HTTPS**) | `_index._agents` | `1` | `chatmodel.in.` | `alpn="h2,h3" port=443 mandatory=alpn,port` |
+| **SVCB** (or **HTTPS**) | `_a2a._agents` | `1` | `chatmodel.in.` | `alpn="a2a" port=443 mandatory=alpn,port` |
+
+**BIND / Zone File Format:**
+```dns
+_index._agents.chatmodel.in. 3600 IN SVCB 1 chatmodel.in. alpn="h2,h3" port=443 mandatory=alpn,port
+_a2a._agents.chatmodel.in.   3600 IN SVCB 1 chatmodel.in. alpn="a2a" port=443 mandatory=alpn,port
+```
+
+2. **Enable DNSSEC**:
+   - In Cloudflare DNS (or your registrar), go to **DNS** > **Settings** > **DNSSEC** and click **Enable DNSSEC**.
+   - Copy the DS record to your domain registrar (GoDaddy, Namecheap, etc.) so validating DNS resolvers return authenticated data.
+
+> **Cloudflare Tip**: If using Cloudflare proxy (orange cloud), ensure you have an SSL certificate that covers `*.chatmodel.in` (Cloudflare Universal SSL covers wildcard subdomains automatically). You can also enable **Markdown for Agents** in Cloudflare (AI & Speed settings) for edge-level markdown conversion.
 
 ---
 

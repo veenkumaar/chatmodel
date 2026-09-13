@@ -1,0 +1,18 @@
+{
+  "resource": "https://chatmodel.in/api",
+  "authorization_servers": [
+    "https://chatmodel.in"
+  ],
+  "scopes_supported": [
+    "openid",
+    "profile",
+    "email",
+    "chat",
+    "tenants:read",
+    "tenants:write"
+  ],
+  "bearer_methods_supported": [
+    "header"
+  ],
+  "resource_documentation": "https://chatmodel.in/faq.php"
+}

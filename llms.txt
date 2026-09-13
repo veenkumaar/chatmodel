@@ -1,0 +1,24 @@
+# ChatModel
+
+> Enterprise Conversational Intelligence & 24/7 AI Assistants Platform
+
+ChatModel (https://chatmodel.in) enables businesses to deploy proprietary 24/7 AI conversational assistants, custom branded client workspaces, dynamic subdomains, and instant automated actions via webhooks.
+
+## Core Capabilities
+
+- **Dedicated Branded AI Workspaces**: Instant custom subdomains (e.g. `client.chatmodel.in`) with bespoke company branding, logos, theme colors, and welcome prompts.
+- **24/7 Real-Time Conversational AI**: Streaming Server-Sent Events (SSE), persistent session memory, lead capture, and multi-turn contextual dialog.
+- **Action Execution & Webhooks**: Direct zero-latency webhook integration with n8n, Make, Zapier, CRMs, and internal enterprise REST APIs.
+- **Enterprise Security**: Strict multi-tenant isolation, SQLite WAL backend, CSRF protection, SSRF guards, rate limiting, and secure iframe embedding.
+
+## Machine Discovery & APIs
+
+- [API Catalog](https://chatmodel.in/.well-known/api-catalog): RFC 9727 / RFC 9264 API Catalog
+- [OpenAPI Specification](https://chatmodel.in/api/openapi.json): Full OpenAPI 3.0 specification for chat and tenant endpoints
+- [Chat Endpoint](https://chatmodel.in/api/chat.php): POST endpoint for sending messages to AI assistants
+
+## Documentation & Legal
+
+- [FAQ](https://chatmodel.in/faq.php): Comprehensive platform FAQ and technical details
+- [Privacy Policy](https://chatmodel.in/privacy.php): Privacy, data retention, and security standards
+- [Terms & Conditions](https://chatmodel.in/terms.php): Terms of service, SLAs, and usage policies

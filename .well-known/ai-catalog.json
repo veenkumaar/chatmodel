@@ -1,0 +1,53 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "ChatModel",
+    "identifier": "did:web:chatmodel.in"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:chatmodel.in:mcp:chat-server",
+      "displayName": "ChatModel MCP Server",
+      "type": "application/mcp-server-card+json",
+      "url": "https://chatmodel.in/.well-known/mcp/server-card.json",
+      "representativeQueries": [
+        "connect to ChatModel AI assistant MCP server",
+        "send chat prompt via Model Context Protocol",
+        "list available MCP tools for ChatModel"
+      ]
+    },
+    {
+      "identifier": "urn:air:chatmodel.in:api:openapi-schema",
+      "displayName": "ChatModel Conversational OpenAPI",
+      "type": "application/openapi+json",
+      "url": "https://chatmodel.in/api/openapi.json",
+      "representativeQueries": [
+        "how to send chat messages to AI assistant via REST API",
+        "OpenAPI schema for ChatModel conversational endpoints",
+        "chat streaming SSE API endpoints"
+      ]
+    },
+    {
+      "identifier": "urn:air:chatmodel.in:skill:assistant-skill",
+      "displayName": "ChatModel Assistant Skill",
+      "type": "text/markdown",
+      "url": "https://chatmodel.in/.well-known/agent-skills/chatmodel-assistant/SKILL.md",
+      "representativeQueries": [
+        "how to interact with ChatModel assistants",
+        "automate customer support workflows with ChatModel webhooks",
+        "multi-tenant workspace capabilities"
+      ]
+    },
+    {
+      "identifier": "urn:air:chatmodel.in:auth:agent-registration",
+      "displayName": "ChatModel Agent Auth & Registration",
+      "type": "text/markdown",
+      "url": "https://chatmodel.in/auth.md",
+      "representativeQueries": [
+        "how do AI agents authenticate with ChatModel",
+        "agent registration and OAuth tokens",
+        "OAuth protected resource metadata for ChatModel"
+      ]
+    }
+  ]
+}

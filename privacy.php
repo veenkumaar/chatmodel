@@ -1,3 +1,35 @@
+<?php
+require_once __DIR__ . '/db/security.php';
+if (Security::wantsMarkdown()) {
+    $md = <<<MD
+# Privacy Policy - ChatModel
+
+**Effective Date:** January 1, 2025  
+**Last Updated:** September 2026  
+
+At **ChatModel** (https://chatmodel.in), we respect your privacy and are committed to protecting personal and conversational data. This Privacy Policy outlines how we collect, store, process, and safeguard information when you use our multi-tenant AI conversational platform.
+
+## 1. Information We Collect
+- **Account & Tenant Information**: Business name, subdomain, administrator email, authentication credentials, and webhook endpoints.
+- **Conversational & Interaction Data**: Messages, session identifiers, and user queries passed to client AI assistants.
+- **Technical & Log Data**: IP address, user-agent, request headers, timestamp, and rate limiting metrics.
+
+## 2. How We Use Information
+- To route chat prompts and responses between users and webhook automation services.
+- To maintain secure multi-tenant isolation across subdomains.
+- To detect, prevent, and mitigate security threats, abuse, and DoS attacks.
+
+## 3. Data Protection & Security
+- All traffic is secured in transit using TLS/SSL encryption.
+- Databases are isolated per tenant and protected by strict defense-in-depth security policies.
+- Conversational data is not sold or used to train public language models.
+
+## 4. Contact Us
+For questions regarding this Privacy Policy, contact us at `support@chatmodel.in`.
+MD;
+    Security::respondWithMarkdown($md);
+}
+?>
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 
@@ -200,6 +232,7 @@
     </div>
 
     <script src="/assets/js/landing.js"></script>
+    <script src="/assets/js/webmcp.js"></script>
 </body>
 
 </html>

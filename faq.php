@@ -1,3 +1,39 @@
+<?php
+require_once __DIR__ . '/db/security.php';
+if (Security::wantsMarkdown()) {
+    $md = <<<MD
+# Frequently Asked Questions (FAQ) - ChatModel
+
+## General & Platform Architecture
+
+### What is ChatModel?
+ChatModel is an enterprise multi-tenant conversational AI platform. We provide dedicated 24/7 AI assistants operating on custom branded subdomains, real-time lead qualification, action workflows, and native webhook integration with platforms like n8n, Make, and internal enterprise systems.
+
+### How do dedicated client subdomains work?
+Each tenant/client receives a private, isolated workspace hosted on their own unique subdomain (e.g. `clientname.chatmodel.in`). All configurations, styling, session memory, and webhooks are segregated.
+
+### Can I embed the AI Assistant onto my existing website?
+Yes. You can embed your ChatModel assistant directly onto any WordPress, Shopify, Webflow, React, or custom HTML site using a responsive iframe widget or via direct API integration.
+
+## Automation & Webhook Integration
+
+### Which automation tools can connect with ChatModel?
+ChatModel connects seamlessly with any webhook-enabled platform, including n8n, Make.com, Zapier, Pabbly, custom Node.js/Python microservices, and enterprise REST APIs.
+
+### Does ChatModel support streaming responses (SSE)?
+Yes! ChatModel supports Server-Sent Events (SSE) streaming for real-time, token-by-token conversational streaming.
+
+## Security & Data Privacy
+
+### Where is conversation data stored?
+Data is isolated per tenant in hardened SQLite WAL databases with strict access control and SSL/TLS encryption.
+
+### Is customer conversational data shared or used to train public models?
+No. Your business workflows, customer inquiries, and proprietary data remain strictly private to your account.
+MD;
+    Security::respondWithMarkdown($md);
+}
+?>
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 
@@ -373,6 +409,7 @@
             });
         }
     </script>
+    <script src="/assets/js/webmcp.js"></script>
 </body>
 
 </html>

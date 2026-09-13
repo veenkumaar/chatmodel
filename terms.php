@@ -1,3 +1,35 @@
+<?php
+require_once __DIR__ . '/db/security.php';
+if (Security::wantsMarkdown()) {
+    $md = <<<MD
+# Terms & Conditions of Service - ChatModel
+
+**Effective Date:** January 1, 2025  
+**Last Updated:** September 2026  
+
+Welcome to **ChatModel** (https://chatmodel.in). By accessing or using our SaaS platform, API endpoints, or client workspaces, you agree to be bound by these Terms & Conditions.
+
+## 1. Service Description
+ChatModel provides multi-tenant conversational AI infrastructure, dynamic client workspaces, API endpoints, and webhook routing tools for commercial enterprises.
+
+## 2. Acceptable Use
+You agree not to:
+- Use the platform to generate or distribute malicious, deceptive, fraudulent, or harmful content.
+- Attempt to bypass tenant rate limits, security defenses, or access unauthorized tenant databases.
+- Launch denial of service (DoS/DDoS) attacks against ChatModel infrastructure.
+
+## 3. Service Level Agreement & Availability
+ChatModel targets 99.9% platform availability. Maintenance windows and critical updates are communicated to workspace administrators.
+
+## 4. Subscriptions & Billing
+Subscriptions are billed on a recurring monthly or annual basis as detailed on our pricing schedule.
+
+## 5. Contact & Inquiries
+For legal or billing inquiries, contact `support@chatmodel.in`.
+MD;
+    Security::respondWithMarkdown($md);
+}
+?>
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 
@@ -211,6 +243,7 @@
     </div>
 
     <script src="/assets/js/landing.js"></script>
+    <script src="/assets/js/webmcp.js"></script>
 </body>
 
 </html>

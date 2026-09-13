@@ -21,6 +21,10 @@
     <meta name="author" content="ChatModel">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://chatmodel.in/">
+    <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
+    <link rel="ai-catalog" href="/.well-known/ai-catalog.json" type="application/json">
+    <link rel="service-desc" href="/api/openapi.json" type="application/openapi+json">
+    <link rel="service-doc" href="/faq.php" type="text/html">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -722,6 +726,7 @@
     </div>
 
     <script src="/assets/js/landing.js"></script>
+    <script src="/assets/js/webmcp.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "chatmodel-assistant",
+      "type": "skill-md",
+      "description": "Interact with ChatModel AI conversational assistants, trigger automated business workflows, and query enterprise workspaces.",
+      "url": "https://chatmodel.in/.well-known/agent-skills/chatmodel-assistant/SKILL.md",
+      "digest": "sha256:06aff11aeadf651f723f8dadc9f78142d77ad57f448521fb2311da811e11a96d"
+    }
+  ]
+}
